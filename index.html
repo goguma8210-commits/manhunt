@@ -65,9 +65,19 @@ button.on{outline:2px solid var(--acc)}
 #pulse.on{animation:beat var(--beat,1000ms) infinite}
 @keyframes beat{0%{opacity:0;box-shadow:inset 0 0 70px 22px rgba(255,20,20,.9)}8%{opacity:1;box-shadow:inset 0 0 70px 22px rgba(255,20,20,.9)}22%{opacity:.25}32%{opacity:.85}100%{opacity:0;box-shadow:inset 0 0 70px 22px rgba(255,20,20,.9)}}
 /* markers */
-.mk{pointer-events:none}
-.mk .dot{width:20px;height:20px;border-radius:50%;border:3px solid #fff;margin:auto;box-shadow:0 1px 4px rgba(0,0,0,.5)}
-.mk .lb{font-size:11px;font-weight:800;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000;text-align:center;white-space:nowrap;margin-top:2px}
+.mk{pointer-events:none;position:relative}
+.mk .dot{width:20px;height:20px;border-radius:50%;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+.mk .lb{position:absolute;top:100%;left:50%;transform:translateX(-50%);font-size:11px;font-weight:800;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000;white-space:nowrap;margin-top:3px}
+/* 신호기(체크포인트) 컨셉: 육각형 비컨 */
+.mk.cp .dot,.mk.cand .dot,.mk.done .dot{width:30px;height:34px;border:none;border-radius:0;box-shadow:none;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;font-family:ui-monospace,Menlo,monospace}
+.mk.cp .dot{background:var(--run);color:#06231a}
+.mk.cand .dot{background:var(--acc);color:#3a2a00;opacity:.9}
+.mk.done .dot{background:#2b313c;color:var(--run)}
+.mk.cp{filter:drop-shadow(0 0 6px rgba(46,229,157,.8))}
+.mk.cp::before{content:'';position:absolute;left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:2px solid var(--run);animation:ring 1.8s ease-out infinite}
+@keyframes ring{from{transform:scale(1);opacity:.9}to{transform:scale(2.8);opacity:0}}
+.aim{width:120px;height:120px;pointer-events:none}
+.aim svg{width:100%;height:100%;transition:opacity .3s}
 .mk.me .dot{background:var(--blue);width:22px;height:22px}
 .mk.runner .dot{background:var(--run)}
 .mk.hunter .dot{background:var(--hunt)}
@@ -101,13 +111,13 @@ button.on{outline:2px solid var(--acc)}
   <h2>MANHUNT</h2>
   <p>실제 동네에서 하는 GPS 술래잡기. 러너는 미션을 깨며 도망치고, 헌터는 폰으로 추적해서 잡아요.</p>
   <h3>🏃 러너 승리</h3>
-  <p>지도의 <b>진짜 체크포인트</b>(초록 네모)를 모두 방문하면 승리. 체크포인트 20m 안에서 30초 머물면 확보돼요.</p>
+  <p>지도의 <b>진짜 체크포인트</b>(초록 육각형 신호기)를 모두 방문하면 승리. 체크포인트 20m 안에서 30초 머물면 확보돼요.</p>
   <h3>🔪 헌터 승리</h3>
   <p>러너를 <b>모두 잡거나</b>, 제한 시간 안에 러너가 체크포인트를 다 못 모으면 승리.</p>
   <h3>⏱ 진행</h3>
   <ul><li>시작 지점에 모두 모여서 시작</li><li>러너 먼저 출발, 헌터는 2분간 화면이 꺼진 채 대기</li><li>그다음 추격 시작</li></ul>
   <h3>🧭 헌터가 아는 것</h3>
-  <ul><li>나침반: 가장 가까운 러너 방향</li><li>위치 핑: 90초마다 러너의 정확한 위치</li><li>체크포인트 후보(노란 네모) — 어느 게 진짜인지는 모름</li></ul>
+  <ul><li>나침반: 지도 위 내 위치 둘레의 빨간 화살표가 가장 가까운 러너 방향을 가리켜요 (지도는 항상 위쪽이 북쪽)</li><li>위치 핑: 90초마다 러너의 정확한 위치</li><li>체크포인트 후보(노란 ? 신호기) — 어느 게 진짜인지는 모름</li></ul>
   <h3>💓 러너가 아는 것</h3>
   <ul><li>진짜 체크포인트 위치</li><li>심장소리: 헌터가 50m 안에 오면 화면이 붉게 뛰고, 가까울수록 빨라져요 (소리는 이어폰 켰을 때만)</li></ul>
   <h3>⛓ 잡기와 구출</h3>
@@ -115,7 +125,7 @@ button.on{outline:2px solid var(--acc)}
   <h3>🚧 규칙</h3>
   <ul><li>빨간 선 구역 밖으로 나가면 내 위치가 상대에게 실시간 공개</li><li>건물 안(로비·엘리베이터·주차장) 진입 금지</li><li>차도는 횡단보도로만</li><li>같은 팀끼리 전화·카톡 자유</li><li>게임 중엔 화면을 켜두세요</li></ul>
   <h3>👑 방장 준비</h3>
-  <ul><li>✏️ 구역 그리기: 손가락으로 경계를 한 번에 쭉 그리기</li><li>체크포인트 후보: 지도를 탭해 추가 (다시 탭하면 삭제)</li><li>시작 지점: 지도를 탭해 지정</li><li>참가자를 탭하면 러너/헌터 전환, 🎲로 랜덤 배정</li></ul>
+  <ul><li>⬡ 구역 설정: 지도를 탭해 꼭짓점을 차례로 찍기 (↩︎로 하나씩 취소)</li><li>체크포인트 후보: 지도를 탭해 추가 (다시 탭하면 삭제)</li><li>시작 지점: 지도를 탭해 지정</li><li>참가자를 탭하면 러너/헌터 전환, 🎲로 랜덤 배정</li></ul>
 </div>
 
 <!-- HUD -->
@@ -136,9 +146,9 @@ button.on{outline:2px solid var(--acc)}
     <div class="row">
       <button class="sm" data-tool="cp">체크포인트 후보</button>
       <button class="sm" data-tool="start">시작 지점</button>
-      <button class="sm" data-tool="zone">✏️ 구역 그리기</button>
+      <button class="sm" data-tool="zone">⬡ 구역 설정</button>
     </div>
-    <div class="row" id="zoneActs" style="margin-top:8px"><button class="sm go" id="zoneDone">구역 저장</button><button class="sm" id="zoneCancel">취소</button></div>
+    <div class="row" id="zoneActs" style="margin-top:8px"><button class="sm go" id="zoneDone">구역 저장</button><button class="sm" id="zoneUndo">↩︎ 되돌리기</button><button class="sm" id="zoneCancel">취소</button></div>
     <p class="mut" id="toolHint" style="margin:8px 0 0"></p>
   </div>
   <div class="mut" id="cfgLbl"></div>
@@ -153,13 +163,13 @@ button.on{outline:2px solid var(--acc)}
 <!-- GAME PANEL -->
 <div id="gamePanel" class="sheet hide">
   <div id="runnerUI" class="hide">
-    <div class="mut" id="checkLbl">진짜 체크포인트(초록 네모) 20m 안에서 30초 머무르면 확보</div>
+    <div class="mut" id="checkLbl">초록 신호기 원 안(20m)에서 30초 머무르면 확보</div>
     <div class="bar"><div id="checkBar"></div></div>
     <div class="row"><button id="soundBtn">🎧 심장소리 끔</button><button id="caughtBtn" class="primary">잡혔음</button></div>
   </div>
   <div id="hunterUI" class="hide">
     <div id="compass"><div id="arrow">⬆</div><div class="mut" id="compassLbl">가장 가까운 러너 방향</div></div>
-    <button id="compassBtn">🧭 나침반 켜기 (폰 방향 반영)</button>
+    
   </div>
 </div>
 
@@ -253,6 +263,14 @@ function edgeDist(p, poly) {
   }
   return m;
 }
+function circle(c, r) {
+  const pts = [];
+  for (let i = 0; i <= 32; i++) {
+    const a = i / 32 * 2 * Math.PI;
+    pts.push([c.lng + r * Math.sin(a) / (111320 * Math.cos(c.lat * D2R)), c.lat + r * Math.cos(a) / 110540]);
+  }
+  return { type: 'Feature', geometry: { type: 'Polygon', coordinates: [pts] } };
+}
 function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 let toastT;
 function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 2200); }
@@ -280,7 +298,7 @@ const markers = {};
 let pingSnap = {}, lastPingIdx = 0;
 let checkin = { cp: null, since: 0 };
 let outSince = null, distHist = [], ending = false;
-let heading = null, soundOn = false, audioCtx = null, beatTimer = null, beatPeriod = 0, wakeLock = null;
+let soundOn = false, audioCtx = null, beatTimer = null, beatPeriod = 0, wakeLock = null;
 const rRef = p => ref(db, `rooms/${roomCode}${p ? '/' + p : ''}`);
 const meRef = () => rRef(`players/${myId}`);
 const isHost = () => room && room.host === myId;
@@ -299,22 +317,29 @@ map.on('load', () => {
   map.addSource('zone', { type: 'geojson', data: fc() });
   map.addLayer({ id: 'zone-fill', type: 'fill', source: 'zone', paint: { 'fill-color': '#ff3b3b', 'fill-opacity': 0.06 } });
   map.addLayer({ id: 'zone-line', type: 'line', source: 'zone', paint: { 'line-color': '#ff3b3b', 'line-width': 3 } });
+  map.dragRotate.disable(); map.touchZoomRotate.disableRotation();
+  map.addSource('cpzone', { type: 'geojson', data: fc() });
+  map.addLayer({ id: 'cpzone-fill', type: 'fill', source: 'cpzone', paint: { 'fill-color': '#2ee59d', 'fill-opacity': 0.12 } });
+  map.addLayer({ id: 'cpzone-line', type: 'line', source: 'cpzone', paint: { 'line-color': '#2ee59d', 'line-width': 2, 'line-dasharray': [2, 2] } });
   map.addSource('draft', { type: 'geojson', data: fc() });
   map.addLayer({ id: 'draft-fill', type: 'fill', source: 'draft', paint: { 'fill-color': '#ffd23f', 'fill-opacity': 0.12 } });
-  map.addLayer({ id: 'draft-line', type: 'line', source: 'draft', paint: { 'line-color': '#ffd23f', 'line-width': 4 } });
+  map.addLayer({ id: 'draft-line', type: 'line', source: 'draft', paint: { 'line-color': '#ffd23f', 'line-width': 3 } });
+  map.addSource('draftPts', { type: 'geojson', data: fc() });
+  map.addLayer({ id: 'draft-pts', type: 'circle', source: 'draftPts', paint: { 'circle-radius': 7, 'circle-color': '#ffd23f', 'circle-stroke-color': '#000', 'circle-stroke-width': 2 } });
   mapReady = true; render();
 });
-function setM(key, ll, cls, label, seen) {
+function setM(key, ll, cls, label, seen, innerTxt) {
   if (!ll || ll.lat == null) return;
   let m = markers[key];
   if (!m) {
     const el = document.createElement('div');
     el.innerHTML = '<div class="mk"><div class="dot"></div><div class="lb"></div></div>';
-    m = markers[key] = new maplibregl.Marker({ element: el, anchor: 'top' }).setLngLat([ll.lng, ll.lat]).addTo(map);
+    m = markers[key] = new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat([ll.lng, ll.lat]).addTo(map);
   }
   const inner = m.getElement().firstChild;
   inner.className = 'mk ' + cls;
   inner.querySelector('.lb').textContent = label || '';
+  inner.querySelector('.dot').textContent = innerTxt || '';
   m.setLngLat([ll.lng, ll.lat]);
   seen.add(key);
 }
@@ -406,56 +431,19 @@ document.querySelectorAll('[data-tool]').forEach(b => b.onclick = () => {
   renderDraft(); render();
 });
 $('#zoneDone').onclick = async () => {
-  if (zoneDraft.length < 3) return alert('손가락으로 구역 테두리를 먼저 그려주세요');
+  if (zoneDraft.length < 3) return alert('꼭짓점을 3개 이상 찍어주세요');
   await update(rRef('config'), { zone: zoneDraft }); tool = null; zoneDraft = []; renderDraft(); render();
 };
 $('#zoneCancel').onclick = () => { tool = null; zoneDraft = []; renderDraft(); render(); };
-let drawing = false, lastPt = null;
 function renderDraft() {
   if (!mapReady) return;
   let d = fc();
-  if (!drawing && zoneDraft.length >= 3) d = { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[...zoneDraft, zoneDraft[0]]] } };
-  else if (zoneDraft.length >= 2) d = { type: 'Feature', geometry: { type: 'LineString', coordinates: zoneDraft } };
+  if (zoneDraft.length >= 3) d = { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[...zoneDraft, zoneDraft[0]]] } };
+  else if (zoneDraft.length === 2) d = { type: 'Feature', geometry: { type: 'LineString', coordinates: zoneDraft } };
   map.getSource('draft').setData(d);
+  map.getSource('draftPts').setData({ type: 'FeatureCollection', features: zoneDraft.map(c => ({ type: 'Feature', geometry: { type: 'Point', coordinates: c } })) });
 }
-// 손가락으로 쭉 그리기
-function syncDrawMode() {
-  if (!mapReady) return;
-  const on = tool === 'zone';
-  ['dragPan', 'touchZoomRotate', 'doubleClickZoom', 'dragRotate'].forEach(h => on ? map[h].disable() : map[h].enable());
-}
-function simplify(pts) {
-  if (pts.length < 4) return pts;
-  const P = pts.map(p => { const q = map.project(p); return [q.x, q.y]; });
-  const keep = P.map(() => false); keep[0] = keep[P.length - 1] = true;
-  const rdp = (a, b) => {
-    const [x1, y1] = P[a], [x2, y2] = P[b], dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy);
-    let m = 0, k = -1;
-    for (let i = a + 1; i < b; i++) {
-      const d = L < 1 ? Math.hypot(P[i][0] - x1, P[i][1] - y1) : Math.abs(dy * P[i][0] - dx * P[i][1] + x2 * y1 - y2 * x1) / L;
-      if (d > m) { m = d; k = i; }
-    }
-    if (m > 4) { keep[k] = true; rdp(a, k); rdp(k, b); }
-  };
-  rdp(0, P.length - 1);
-  return pts.filter((_, i) => keep[i]);
-}
-const cc = map.getCanvasContainer();
-function addDrawPt(e) {
-  const r = cc.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
-  if (lastPt && Math.hypot(x - lastPt[0], y - lastPt[1]) < 6) return;
-  lastPt = [x, y];
-  const ll = map.unproject([x, y]);
-  zoneDraft.push([ll.lng, ll.lat]); renderDraft();
-}
-cc.addEventListener('pointerdown', e => {
-  if (tool !== 'zone' || !isHost() || !room || room.status !== 'lobby') return;
-  drawing = true; zoneDraft = []; lastPt = null; addDrawPt(e); e.preventDefault();
-});
-cc.addEventListener('pointermove', e => { if (drawing) { addDrawPt(e); e.preventDefault(); } });
-const endDraw = () => { if (!drawing) return; drawing = false; zoneDraft = simplify(zoneDraft); renderDraft(); render(); };
-cc.addEventListener('pointerup', endDraw);
-cc.addEventListener('pointercancel', endDraw);
+$('#zoneUndo').onclick = () => { zoneDraft.pop(); renderDraft(); render(); };
 map.on('click', e => {
   if (!room || room.status !== 'lobby' || !isHost() || !tool) return;
   const p = { lng: e.lngLat.lng, lat: e.lngLat.lat };
@@ -465,6 +453,8 @@ map.on('click', e => {
     else set(rRef('config/candidates/c' + Date.now().toString(36)), p);
   } else if (tool === 'start') {
     update(rRef('config'), { start: p }); tool = null; render();
+  } else if (tool === 'zone') {
+    zoneDraft.push([p.lng, p.lat]); renderDraft(); render();
   }
 });
 $('#plist').onclick = e => {
@@ -484,7 +474,7 @@ $('#startBtn').onclick = async () => {
   if (!runners.length || !hunters.length) return alert('러너와 헌터가 최소 1명씩 필요해요');
   const cands = Object.keys(cfg.candidates || {});
   if (cands.length < cfg.winCount) return alert(`체크포인트 후보를 ${cfg.winCount}곳 이상 찍어주세요 (지금 ${cands.length}곳)`);
-  if (!cfg.zone || cfg.zone.length < 3) return alert('✏️ 구역 그리기로 경계를 먼저 그려주세요');
+  if (!cfg.zone || cfg.zone.length < 3) return alert('⬡ 구역 설정으로 경계를 먼저 찍어주세요');
   if (!cfg.start) return alert('시작 지점을 찍어주세요');
   const far = ps.filter(([, p]) => !(p.lat != null && dist(p, cfg.start) <= cfg.startR));
   if (far.length && !confirm(`${far.map(([, p]) => p.name).join(', ')} 님이 시작 지점 ${cfg.startR}m 밖이에요. 그래도 시작할까요?`)) return;
@@ -517,27 +507,30 @@ $('#soundBtn').onclick = () => {
   $('#soundBtn').textContent = soundOn ? '🎧 심장소리 켬' : '🎧 심장소리 끔';
   if (soundOn) thump();
 };
-$('#compassBtn').onclick = async () => {
-  try {
-    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-      if (await DeviceOrientationEvent.requestPermission() !== 'granted') return;
-    }
-    window.addEventListener('deviceorientationabsolute', onOri, true);
-    window.addEventListener('deviceorientation', onOri, true);
-    $('#compassBtn').classList.add('hide');
-  } catch (e) { alert('나침반을 켤 수 없어요'); }
-};
-function onOri(e) {
-  if (e.webkitCompassHeading != null) heading = e.webkitCompassHeading;
-  else if (e.absolute && e.alpha != null) heading = 360 - e.alpha;
-  updateCompass();
+// 나침반: 폰 자이로 대신 GPS 좌표로만 계산 → 지도 위 화살표 (지도는 항상 북쪽이 위)
+let compassBearing = null, aimX = 0, aimY = 0, aimNear = false, aimMarker = null;
+const AIM_SVG = '<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="44" fill="none" stroke="#ff4d4d" stroke-opacity=".35" stroke-width="2" stroke-dasharray="4 5"/><path d="M60 4 L74 26 L60 20 L46 26 Z" fill="#ff4d4d" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>';
+function smoothBearing(b) {
+  // 각도를 벡터로 평균 내서 떨림 제거
+  const r = b * D2R;
+  aimX = aimX * 0.6 + Math.sin(r) * 0.4; aimY = aimY * 0.6 + Math.cos(r) * 0.4;
+  return (Math.atan2(aimX, aimY) / D2R + 360) % 360;
 }
-let compassBearing = null;
 function updateCompass() {
-  if (compassBearing == null) { $('#arrow').style.transform = ''; $('#arrow').textContent = '·'; return; }
-  $('#arrow').textContent = '⬆';
-  $('#arrow').style.transform = `rotate(${compassBearing - (heading || 0)}deg)`;
+  const arrow = $('#arrow');
+  if (compassBearing == null) { arrow.style.transform = ''; arrow.textContent = '·'; }
+  else if (aimNear) { arrow.style.transform = ''; arrow.textContent = '‼'; }
+  else { arrow.textContent = '⬆'; arrow.style.transform = `rotate(${compassBearing}deg)`; }
+  const show = role0() === 'hunter' && compassBearing != null && myPos;
+  if (!show) { if (aimMarker) { aimMarker.remove(); aimMarker = null; } return; }
+  if (!aimMarker) {
+    const el = document.createElement('div'); el.className = 'aim'; el.innerHTML = AIM_SVG;
+    aimMarker = new maplibregl.Marker({ element: el, anchor: 'center', rotationAlignment: 'map' }).setLngLat([myPos.lng, myPos.lat]).addTo(map);
+  }
+  aimMarker.setLngLat([myPos.lng, myPos.lat]).setRotation(compassBearing);
+  aimMarker.getElement().querySelector('svg').style.opacity = aimNear ? 0.25 : 1;
 }
+const role0 = () => (me() || {}).role;
 
 // heartbeat
 function setBeat(period) {
@@ -597,7 +590,7 @@ function tick() {
       $('#checkLbl').textContent = `체크인 중… ${Math.max(0, Math.ceil(cfg.checkinSec - el))}초`;
       if (el >= cfg.checkinSec) { set(rRef('visited/' + target), { by: myId, at: t }); checkin.cp = null; toast('✅ 체크포인트 확보!'); }
     }
-    if (!target) $('#checkLbl').textContent = '진짜 체크포인트(초록 네모) 20m 안에서 30초 머무르면 확보';
+    if (!target) $('#checkLbl').textContent = '초록 신호기 원 안(20m)에서 30초 머무르면 확보';
     // 심장소리: 가장 가까운 헌터
     let d = Infinity;
     if (myPos && !m.caught) ps.forEach(([, p]) => { if (p.role === 'hunter' && p.lat != null) d = Math.min(d, dist(myPos, p)); });
@@ -619,8 +612,11 @@ function tick() {
     // 나침반: 가장 가까운 활동 중 러너
     let best = null, bd = Infinity;
     if (myPos) runners.forEach(([, p]) => { if (!p.caught && p.lat != null) { const dd = dist(myPos, p); if (dd < bd) { bd = dd; best = p; } } });
-    compassBearing = best && t >= room.huntStartAt ? brg(myPos, best) : null;
-    $('#compassLbl').textContent = compassBearing == null ? '추적 대상 없음' : (heading == null ? '가장 가까운 러너 방향 (화면 위쪽 = 북쪽)' : '가장 가까운 러너 방향');
+    if (best && t >= room.huntStartAt) {
+      aimNear = bd < 25; // 25m 안에선 GPS 오차가 커서 방향 대신 경고
+      compassBearing = smoothBearing(brg(myPos, best));
+    } else { compassBearing = null; aimX = aimY = 0; }
+    $('#compassLbl').textContent = compassBearing == null ? '추적 대상 없음' : aimNear ? '아주 가까이 있음! 눈으로 찾으세요' : '가장 가까운 러너 방향 (지도 기준, 위 = 북쪽)';
     updateCompass();
   }
 
@@ -642,8 +638,12 @@ function render() {
   if (!room) { cleanup(seen); return; }
   const cfg = room.config || {}, m = me() || {}, st = room.status, t = now();
   const role = m.role, ps = players();
-  if (mapReady) map.getSource('zone').setData(zoneGeo(cfg.zone));
-  syncDrawMode();
+  if (mapReady) {
+    map.getSource('zone').setData(zoneGeo(cfg.zone));
+    const cands = cfg.candidates || {}, visited = room.visited || {};
+    const circ = st === 'playing' && role === 'runner' ? (cfg.real || []).filter(id => cands[id] && !visited[id]).map(id => circle(cands[id], cfg.checkinR)) : [];
+    map.getSource('cpzone').setData({ type: 'FeatureCollection', features: circ });
+  }
 
   show('#lobby', st === 'lobby');
   show('#gamePanel', st === 'playing');
@@ -670,14 +670,14 @@ function render() {
     show('#hostTools', host); show('#hostBtns', host); show('#waitLbl', !host);
     document.querySelectorAll('[data-tool]').forEach(b => b.classList.toggle('on', b.dataset.tool === tool));
     show('#zoneActs', tool === 'zone');
-    $('#toolHint').textContent = tool === 'cp' ? '지도를 탭해 후보 추가 · 기존 후보 근처를 탭하면 삭제' : tool === 'start' ? '지도에서 시작 지점을 탭하세요' : tool === 'zone' ? (zoneDraft.length >= 3 && !drawing ? '마음에 들면 [구역 저장], 다시 그리려면 한 번 더 그리기' : '손가락으로 구역 테두리를 한 번에 쭉 그리세요 (그리는 동안 지도 고정)') : '참가자를 탭하면 러너/헌터가 바뀌어요';
+    $('#toolHint').textContent = tool === 'cp' ? '지도를 탭해 후보 추가 · 기존 후보 근처를 탭하면 삭제' : tool === 'start' ? '지도에서 시작 지점을 탭하세요' : tool === 'zone' ? `경계를 따라 지도를 탭해 꼭짓점을 찍으세요 · ${zoneDraft.length}개${zoneDraft.length >= 3 ? ' → [구역 저장]' : ''}` : '참가자를 탭하면 러너/헌터가 바뀌어요';
     const nC = Object.keys(cfg.candidates || {}).length;
     $('#cfgLbl').textContent = `${cfg.zone ? '' : '구역 미지정 · '}체크포인트 후보 ${nC}곳 중 진짜 ${cfg.winCount}곳 · 핑 ${cfg.pingSec}초 · ${cfg.durationMin}분${cfg.start ? '' : ' · 시작 지점 미지정'}`;
     $('#plist').innerHTML = ps.map(([id, p]) => {
       const d = cfg.start && p.lat != null ? dist(p, cfg.start) : null;
       return `<div class="pl" data-id="${id}"><span class="chip ${p.role}">${p.role === 'runner' ? '러너' : '헌터'}</span><span class="pn">${esc(p.name)}${id === room.host ? ' 👑' : ''}${id === myId ? ' (나)' : ''}</span><span class="pd">${d == null ? '—' : Math.round(d) + 'm'} ${d != null && d <= cfg.startR ? '✅' : ''}</span></div>`;
     }).join('');
-    Object.entries(cfg.candidates || {}).forEach(([id, c]) => setM('c_' + id, c, 'cand', '', seen));
+    Object.entries(cfg.candidates || {}).forEach(([id, c]) => setM('c_' + id, c, 'cand', '', seen, '?'));
     if (cfg.start) setM('start', cfg.start, 'start', '시작', seen);
     ps.forEach(([id, p]) => { if (id !== myId) setM('p_' + id, p, p.role, p.name, seen); });
     show('#jail', false); show('#blackout', false);
@@ -699,14 +699,14 @@ function render() {
     if (m.immuneUntil && t < m.immuneUntil) banner(`🛡 무적 ${Math.ceil((m.immuneUntil - t) / 1000)}초`);
 
     if (role === 'runner') {
-      (cfg.real || []).forEach(id => { if (cands[id]) setM('c_' + id, cands[id], visited[id] ? 'done' : 'cp', visited[id] ? '확보' : '', seen); });
+      (cfg.real || []).forEach((id, i) => { if (cands[id]) setM('c_' + id, cands[id], visited[id] ? 'done' : 'cp', visited[id] ? '확보' : '', seen, visited[id] ? '✓' : String(i + 1)); });
       ps.forEach(([id, p]) => {
         if (id === myId) return;
         if (p.role === 'runner') setM('p_' + id, p, p.caught ? 'jail' : 'runner', p.name + (p.caught ? ' ⛓' : ''), seen);
         else if (p.out) setM('p_' + id, p, 'out', p.name + ' (이탈)', seen);
       });
     } else {
-      Object.entries(cands).forEach(([id, c]) => setM('c_' + id, c, 'cand', '', seen));
+      Object.entries(cands).forEach(([id, c]) => setM('c_' + id, c, 'cand', '', seen, '?'));
       ps.forEach(([id, p]) => {
         if (id === myId) return;
         if (p.role === 'hunter') setM('p_' + id, p, 'hunter', p.name, seen);
@@ -720,6 +720,7 @@ function render() {
     }
   }
 
+  if (st !== 'playing' && aimMarker) { aimMarker.remove(); aimMarker = null; }
   if (st === 'ended') {
     show('#jail', false); show('#blackout', false); setBeat(0); banner('');
     const runners = ps.filter(([, p]) => p.role === 'runner');
