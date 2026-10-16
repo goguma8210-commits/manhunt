@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>MANHUNT</title>
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<style>
+:root{--bg:#0d0f14;--panel:rgba(16,19,26,.93);--line:#2a2f3a;--txt:#f2f4f8;--mut:#9aa3b2;--run:#2ee59d;--hunt:#ff4d4d;--acc:#ffd23f;--blue:#3d8bff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;overflow:hidden}
+#map{position:fixed;inset:0}
+.hide{display:none!important}
+input{width:100%;padding:14px;border-radius:12px;border:1px solid var(--line);background:#161a22;color:var(--txt);font-size:16px}
+button{padding:13px 16px;border-radius:12px;border:1px solid var(--line);background:#1c212b;color:var(--txt);font-size:15px;font-weight:700}
+button.primary{background:var(--hunt);border-color:var(--hunt);color:#fff}
+button.go{background:var(--run);border-color:var(--run);color:#06231a}
+button.sm{padding:8px 12px;font-size:13px}
+button.on{outline:2px solid var(--acc)}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+.mut{color:var(--mut);font-size:13px;line-height:1.5}
+/* home */
+#home{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;justify-content:center;gap:12px;padding:24px;background:radial-gradient(circle at 50% 20%,#3a1014 0,#0d0f14 60%)}
+#home h1{font-size:46px;letter-spacing:6px;margin:0;font-weight:900}
+#home .sub{margin:0 0 18px;color:var(--mut)}
+/* sheet */
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--panel);border-radius:18px 18px 0 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom));max-height:58vh;overflow:auto;display:flex;flex-direction:column;gap:10px}
+.code{font-size:22px;font-weight:900;letter-spacing:3px}
+.pl{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;background:#161a22}
+.pl .pn{flex:1;font-weight:700}
+.pl .pd{color:var(--mut);font-size:13px}
+.chip{font-size:12px;font-weight:800;padding:4px 9px;border-radius:999px}
+.chip.runner{background:var(--run);color:#06231a}
+.chip.hunter{background:var(--hunt);color:#fff}
+/* hud */
+#hud{position:fixed;top:0;left:0;right:0;z-index:10;padding:calc(8px + env(safe-area-inset-top)) 12px 8px;display:flex;gap:6px;flex-wrap:wrap;pointer-events:none}
+.pill{background:var(--panel);border-radius:999px;padding:7px 12px;font-weight:800;font-size:14px}
+.pill.role-runner{background:var(--run);color:#06231a}
+.pill.role-hunter{background:var(--hunt);color:#fff}
+#banner{position:fixed;left:12px;right:12px;top:calc(56px + env(safe-area-inset-top));z-index:12;background:#ff9f1c;color:#1a1000;font-weight:800;padding:10px 12px;border-radius:12px;text-align:center}
+#toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);z-index:25;background:rgba(0,0,0,.85);padding:14px 20px;border-radius:14px;font-weight:800;font-size:17px;pointer-events:none;opacity:0;transition:opacity .3s}
+#toast.show{opacity:1}
+/* checkin bar */
+.bar{height:12px;border-radius:6px;background:#222833;overflow:hidden}
+.bar>div{height:100%;width:0;background:var(--run);transition:width .9s linear}
+/* compass */
+#compass{display:flex;align-items:center;gap:14px}
+#arrow{width:64px;height:64px;border-radius:50%;background:#161a22;border:2px solid var(--hunt);display:flex;align-items:center;justify-content:center;font-size:34px;transition:transform .25s}
+/* overlays */
+#blackout,#result,#jail{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center}
+#blackout{background:#000}
+#blackout .big,#jail .big{font-size:56px;font-weight:900}
+#result{background:rgba(5,6,9,.95)}
+#result h2{font-size:34px;margin:0}
+#jail{background:rgba(20,20,24,.9);z-index:9}
+#pulse{position:fixed;inset:0;pointer-events:none;z-index:15;opacity:0}
+#pulse.on{animation:beat var(--beat,1000ms) infinite}
+@keyframes beat{0%{opacity:0;box-shadow:inset 0 0 70px 22px rgba(255,20,20,.9)}8%{opacity:1;box-shadow:inset 0 0 70px 22px rgba(255,20,20,.9)}22%{opacity:.25}32%{opacity:.85}100%{opacity:0;box-shadow:inset 0 0 70px 22px rgba(255,20,20,.9)}}
+/* markers */
+.mk{pointer-events:none}
+.mk .dot{width:20px;height:20px;border-radius:50%;border:3px solid #fff;margin:auto;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+.mk .lb{font-size:11px;font-weight:800;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000;text-align:center;white-space:nowrap;margin-top:2px}
+.mk.me .dot{background:var(--blue);width:22px;height:22px}
+.mk.runner .dot{background:var(--run)}
+.mk.hunter .dot{background:var(--hunt)}
+.mk.cand .dot{background:var(--acc);border-radius:5px}
+.mk.cp .dot{background:var(--run);border-radius:5px}
+.mk.done .dot{background:#666;border-radius:5px}
+.mk.start .dot{background:#b06bff;width:24px;height:24px}
+.mk.ping .dot{background:transparent;border:3px solid var(--run);width:28px;height:28px}
+.mk.jail .dot{background:#888}
+.mk.out .dot{background:#ff9f1c}
+</style>
+</head>
+<body>
+<div id="map"></div>
+
+<!-- HOME -->
+<div id="home">
+  <h1>MANHUNT</h1>
+  <p class="sub">GPS 술래잡기 · 테스트판</p>
+  <input id="nameIn" placeholder="닉네임" maxlength="10">
+  <button id="createBtn" class="primary">방 만들기</button>
+  <div class="row"><input id="codeIn" placeholder="방 코드 6자리" inputmode="numeric" maxlength="6"><button id="joinBtn" style="flex:.45">참가</button></div>
+  <p class="mut" id="homeMsg">위치 권한을 허용해야 참가할 수 있어요. 게임 중엔 화면을 켜두세요.</p>
+</div>
+
+<!-- HUD -->
+<div id="hud" class="hide"></div>
+<div id="banner" class="hide"></div>
+<div id="toast"></div>
+<div id="pulse"></div>
+
+<!-- LOBBY -->
+<div id="lobby" class="sheet hide">
+  <div class="row" style="align-items:center">
+    <div><div class="mut">방 코드</div><div class="code" id="codeLbl"></div></div>
+    <button class="sm" id="shareBtn" style="flex:0">링크 공유</button>
+    <button class="sm" id="leaveBtn" style="flex:0">나가기</button>
+  </div>
+  <div id="hostTools" class="hide">
+    <div class="row">
+      <button class="sm" data-tool="cp">체크포인트 후보</button>
+      <button class="sm" data-tool="start">시작 지점</button>
+      <button class="sm" data-tool="zone">구역 다시 그리기</button>
+    </div>
+    <div class="row" id="zoneActs" style="margin-top:8px"><button class="sm go" id="zoneDone">구역 완료</button><button class="sm" id="zoneCancel">취소</button></div>
+    <p class="mut" id="toolHint" style="margin:8px 0 0"></p>
+  </div>
+  <div class="mut" id="cfgLbl"></div>
+  <div id="plist" style="display:flex;flex-direction:column;gap:6px"></div>
+  <div class="row" id="hostBtns">
+    <button id="randBtn">🎲 랜덤 배정</button>
+    <button id="startBtn" class="primary">게임 시작</button>
+  </div>
+  <p class="mut hide" id="waitLbl">방장이 시작하길 기다리는 중…</p>
+</div>
+
+<!-- GAME PANEL -->
+<div id="gamePanel" class="sheet hide">
+  <div id="runnerUI" class="hide">
+    <div class="mut" id="checkLbl">진짜 체크포인트(초록 네모) 20m 안에서 30초 머무르면 확보</div>
+    <div class="bar"><div id="checkBar"></div></div>
+    <div class="row"><button id="soundBtn">🎧 심장소리 끔</button><button id="caughtBtn" class="primary">잡혔음</button></div>
+  </div>
+  <div id="hunterUI" class="hide">
+    <div id="compass"><div id="arrow">⬆</div><div class="mut" id="compassLbl">가장 가까운 러너 방향</div></div>
+    <button id="compassBtn">🧭 나침반 켜기 (폰 방향 반영)</button>
+  </div>
+</div>
+
+<!-- JAIL -->
+<div id="jail" class="hide">
+  <div>⛓ 감옥</div>
+  <div class="big" id="jailTimer">5:00</div>
+  <div class="mut" id="jailInfo">동료가 와서 터치하면 아래 버튼을 누르세요</div>
+  <button id="rescueBtn" class="go">구출됨</button>
+</div>
+
+<!-- BLACKOUT (hunter head start) -->
+<div id="blackout" class="hide">
+  <div>러너가 흩어지는 중…</div>
+  <div class="big" id="boTimer">2:00</div>
+  <div class="mut">시작 지점에서 대기하세요</div>
+</div>
+
+<!-- RESULT -->
+<div id="result" class="hide">
+  <h2 id="resTitle"></h2>
+  <div class="mut" id="resInfo"></div>
+  <button id="againBtn" class="primary">같은 멤버로 다시하기</button>
+  <div class="mut hide" id="againWait">방장이 다시 시작하길 기다리는 중…</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set, update, onValue, get, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+// ====== 1. 여기에 Firebase 설정을 붙여넣으세요 ======
+const firebaseConfig = {
+  apiKey: "AIzaSyBnIZYW1oy6ZOsWLmF7KhmFOl3recL6koQ",
+  authDomain: "manhunt-20983.firebaseapp.com",
+  databaseURL: "https://manhunt-20983-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "manhunt-20983",
+  storageBucket: "manhunt-20983.firebasestorage.app",
+  messagingSenderId: "813597687246",
+  appId: "1:813597687246:web:7df145f94084e2a52aff9f"
+};
+
+// ====== 2. 게임 기본값 (테스트하며 조정) ======
+const DEF = {
+  durationMin: 25,    // 게임 시간 (선출발 포함)
+  headStartSec: 120,  // 러너 선출발
+  pingSec: 90,        // 위치 핑 간격
+  checkinSec: 30,     // 체크인 머무는 시간
+  checkinR: 20,       // 체크인 반경 (m)
+  winCount: 4,        // 러너 승리에 필요한 체크포인트 수 (진짜 체크포인트 수)
+  jailSec: 300,       // 감옥 제한 시간
+  zoneBuffer: 15,     // 구역 경계 오차 허용 (m)
+  outGraceSec: 10,    // 구역 이탈 유예
+  startR: 30          // 시작 지점 집합 반경 (m)
+};
+// 마린시티 기본 구역 (네이버 지도 그림 기준 근사치 — 어긋나면 방장이 다시 그리기)
+const DEFAULT_ZONE = [[129.14383,35.16016],[129.14581,35.16002],[129.14845,35.15944],[129.15153,35.15844],[129.15258,35.15786],[129.15196,35.15728],[129.15003,35.15656],[129.14968,35.15570],[129.14986,35.15390],[129.14889,35.15296],[129.14757,35.15289],[129.14493,35.15347],[129.14274,35.15440],[129.14177,35.15534],[129.14177,35.15642],[129.14247,35.15721],[129.14353,35.15786],[129.14375,35.15930]];
+const CENTER = [129.1468, 35.1565];
+
+// ====== utils ======
+const $ = s => document.querySelector(s);
+const D2R = Math.PI / 180;
+let offset = 0;
+const now = () => Date.now() + offset;
+const esc = s => String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = ms => { ms = Math.max(0, ms); const s = Math.ceil(ms / 1000); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+function dist(a, b) {
+  const p1 = a.lat * D2R, p2 = b.lat * D2R, dp = (b.lat - a.lat) * D2R, dl = (b.lng - a.lng) * D2R;
+  const h = Math.sin(dp / 2) ** 2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) ** 2;
+  return 6371000 * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+}
+function brg(a, b) {
+  const p1 = a.lat * D2R, p2 = b.lat * D2R, dl = (b.lng - a.lng) * D2R;
+  const y = Math.sin(dl) * Math.cos(p2), x = Math.cos(p1) * Math.sin(p2) - Math.sin(p1) * Math.cos(p2) * Math.cos(dl);
+  return (Math.atan2(y, x) / D2R + 360) % 360;
+}
+function inPoly(p, poly) {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, yi] = poly[i], [xj, yj] = poly[j];
+    if ((yi > p.lat) !== (yj > p.lat) && p.lng < (xj - xi) * (p.lat - yi) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+function proj(q, o) { const k = Math.cos(o.lat * D2R) * 111320; return [(q[0] - o.lng) * k, (q[1] - o.lat) * 110540]; }
+function edgeDist(p, poly) {
+  let m = Infinity;
+  for (let i = 0; i < poly.length; i++) {
+    const a = proj(poly[i], p), b = proj(poly[(i + 1) % poly.length], p);
+    const dx = b[0] - a[0], dy = b[1] - a[1], l = dx * dx + dy * dy;
+    let t = l ? -(a[0] * dx + a[1] * dy) / l : 0; t = Math.max(0, Math.min(1, t));
+    m = Math.min(m, Math.hypot(a[0] + t * dx, a[1] + t * dy));
+  }
+  return m;
+}
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+let toastT;
+function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 2200); }
+function banner(t) { const el = $('#banner'); if (!t) return el.classList.add('hide'); el.textContent = t; el.classList.remove('hide'); }
+const show = (sel, on) => $(sel).classList.toggle('hide', !on);
+
+// ====== firebase ======
+if (firebaseConfig.apiKey === "여기에") {
+  $('#homeMsg').textContent = '⚠️ index.html 안의 firebaseConfig를 먼저 붙여넣어 주세요.';
+}
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+onValue(ref(db, '.info/serverTimeOffset'), s => offset = s.val() || 0);
+
+let myId = store('mh_id');
+if (!myId) { myId = Math.random().toString(36).slice(2, 10); store('mh_id', myId); }
+$('#nameIn').value = store('mh_name') || '';
+const qRoom = new URLSearchParams(location.search).get('room');
+if (qRoom) $('#codeIn').value = qRoom;
+
+// ====== state ======
+let room = null, roomCode = null, prevStatus = null, myPos = null, lastWrite = 0;
+let tool = null, zoneDraft = [];
+const markers = {};
+let pingSnap = {}, lastPingIdx = 0;
+let checkin = { cp: null, since: 0 };
+let outSince = null, distHist = [], ending = false;
+let heading = null, soundOn = false, audioCtx = null, beatTimer = null, beatPeriod = 0, wakeLock = null;
+const rRef = p => ref(db, `rooms/${roomCode}${p ? '/' + p : ''}`);
+const meRef = () => rRef(`players/${myId}`);
+const isHost = () => room && room.host === myId;
+const me = () => room && room.players && room.players[myId];
+const players = () => Object.entries((room && room.players) || {});
+
+// ====== map ======
+const map = new maplibregl.Map({ container: 'map', style: 'https://tiles.openfreemap.org/styles/liberty', center: CENTER, zoom: 15.2, attributionControl: { compact: true } });
+let mapReady = false;
+const fc = () => ({ type: 'FeatureCollection', features: [] });
+function zoneGeo(z) {
+  if (!z || z.length < 3) return fc();
+  return { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[...z, z[0]]] } };
+}
+map.on('load', () => {
+  map.addSource('zone', { type: 'geojson', data: zoneGeo(DEFAULT_ZONE) });
+  map.addLayer({ id: 'zone-fill', type: 'fill', source: 'zone', paint: { 'fill-color': '#ff3b3b', 'fill-opacity': 0.06 } });
+  map.addLayer({ id: 'zone-line', type: 'line', source: 'zone', paint: { 'line-color': '#ff3b3b', 'line-width': 3 } });
+  map.addSource('draft', { type: 'geojson', data: fc() });
+  map.addLayer({ id: 'draft-line', type: 'line', source: 'draft', paint: { 'line-color': '#ffd23f', 'line-width': 3, 'line-dasharray': [2, 1] } });
+  mapReady = true; render();
+});
+function setM(key, ll, cls, label, seen) {
+  if (!ll || ll.lat == null) return;
+  let m = markers[key];
+  if (!m) {
+    const el = document.createElement('div');
+    el.innerHTML = '<div class="mk"><div class="dot"></div><div class="lb"></div></div>';
+    m = markers[key] = new maplibregl.Marker({ element: el, anchor: 'top' }).setLngLat([ll.lng, ll.lat]).addTo(map);
+  }
+  const inner = m.getElement().firstChild;
+  inner.className = 'mk ' + cls;
+  inner.querySelector('.lb').textContent = label || '';
+  m.setLngLat([ll.lng, ll.lat]);
+  seen.add(key);
+}
+function fitZone() {
+  const z = (room && room.config && room.config.zone) || DEFAULT_ZONE;
+  const lngs = z.map(p => p[0]), lats = z.map(p => p[1]);
+  map.fitBounds([[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]], { padding: { top: 70, bottom: 220, left: 30, right: 30 }, duration: 600 });
+}
+
+// ====== location ======
+let geoStarted = false;
+function ensureGeo() {
+  return new Promise((res, rej) => {
+    if (geoStarted && myPos) return res();
+    if (!navigator.geolocation) return rej(new Error('위치 기능을 지원하지 않는 브라우저예요'));
+    let first = true;
+    geoStarted = true;
+    navigator.geolocation.watchPosition(p => {
+      myPos = { lng: p.coords.longitude, lat: p.coords.latitude, acc: p.coords.accuracy };
+      if (first) { first = false; res(); }
+      pushPos();
+    }, e => {
+      if (first) { first = false; geoStarted = false; rej(e); } else banner('위치 신호가 약해요: ' + e.message);
+    }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
+  });
+}
+function pushPos() {
+  if (!roomCode || !myPos || now() - lastWrite < 2000) return;
+  lastWrite = now();
+  update(meRef(), { lat: myPos.lat, lng: myPos.lng, acc: Math.round(myPos.acc), ts: now() });
+}
+
+// ====== home ======
+function getName() {
+  const n = $('#nameIn').value.trim();
+  if (!n) { alert('닉네임을 입력해주세요'); return null; }
+  store('mh_name', n); return n;
+}
+async function geoOrAlert() {
+  try { await ensureGeo(); return true; }
+  catch (e) { alert('위치 권한이 필요해요. 설정 > Safari > 위치에서 허용해주세요.\n(' + (e.message || e) + ')'); return false; }
+}
+$('#createBtn').onclick = async () => {
+  const name = getName(); if (!name || !(await geoOrAlert())) return;
+  let code;
+  for (let i = 0; i < 5; i++) { code = String(Math.floor(100000 + Math.random() * 900000)); if (!(await get(ref(db, 'rooms/' + code))).exists()) break; }
+  await set(ref(db, 'rooms/' + code), { host: myId, status: 'lobby', createdAt: now(), config: { ...DEF, zone: DEFAULT_ZONE }, players: { [myId]: { name, role: 'hunter', ts: now() } } });
+  enterRoom(code);
+};
+$('#joinBtn').onclick = async () => {
+  const name = getName(); const code = $('#codeIn').value.trim();
+  if (!name) return; if (!/^\d{6}$/.test(code)) return alert('6자리 코드를 입력해주세요');
+  if (!(await geoOrAlert())) return;
+  const s = await get(ref(db, 'rooms/' + code));
+  if (!s.exists()) return alert('방을 찾을 수 없어요');
+  const r = s.val(), exists = r.players && r.players[myId];
+  if (r.status !== 'lobby' && !exists) return alert('이미 시작된 게임이에요');
+  await update(ref(db, `rooms/${code}/players/${myId}`), exists ? { name } : { name, role: 'runner', ts: now() });
+  enterRoom(code);
+};
+function enterRoom(code) {
+  roomCode = code;
+  history.replaceState(null, '', '?room=' + code);
+  show('#home', false);
+  lastWrite = 0; pushPos();
+  onValue(ref(db, 'rooms/' + code), s => {
+    room = s.val();
+    if (!room) { alert('방이 사라졌어요'); location.href = location.pathname; return; }
+    if (room.status === 'playing' && prevStatus !== 'playing') onGameStart();
+    if (room.status === 'lobby' && prevStatus !== 'lobby') { setBeat(0); banner(''); }
+    prevStatus = room.status;
+    render();
+  });
+  setTimeout(fitZone, 400);
+}
+
+// ====== lobby ======
+$('#shareBtn').onclick = async () => {
+  const url = location.origin + location.pathname + '?room=' + roomCode;
+  try { if (navigator.share) await navigator.share({ title: 'MANHUNT', text: '방 코드 ' + roomCode, url }); else { await navigator.clipboard.writeText(url); toast('링크 복사됨'); } } catch (e) {}
+};
+$('#leaveBtn').onclick = async () => { if (!confirm('방에서 나갈까요?')) return; await remove(meRef()); location.href = location.pathname; };
+document.querySelectorAll('[data-tool]').forEach(b => b.onclick = () => {
+  const t = b.dataset.tool;
+  tool = tool === t ? null : t;
+  if (tool === 'zone') zoneDraft = [];
+  renderDraft(); render();
+});
+$('#zoneDone').onclick = async () => {
+  if (zoneDraft.length < 3) return alert('꼭짓점을 3개 이상 찍어주세요');
+  await update(rRef('config'), { zone: zoneDraft }); tool = null; zoneDraft = []; renderDraft(); render();
+};
+$('#zoneCancel').onclick = () => { tool = null; zoneDraft = []; renderDraft(); render(); };
+function renderDraft() {
+  if (!mapReady) return;
+  map.getSource('draft').setData(zoneDraft.length >= 2 ? { type: 'Feature', geometry: { type: 'LineString', coordinates: zoneDraft } } : fc());
+}
+map.on('click', e => {
+  if (!room || room.status !== 'lobby' || !isHost() || !tool) return;
+  const p = { lng: e.lngLat.lng, lat: e.lngLat.lat };
+  if (tool === 'cp') {
+    const near = Object.entries(room.config.candidates || {}).find(([, v]) => dist(v, p) < 20);
+    if (near) remove(rRef('config/candidates/' + near[0]));
+    else set(rRef('config/candidates/c' + Date.now().toString(36)), p);
+  } else if (tool === 'start') {
+    update(rRef('config'), { start: p }); tool = null; render();
+  } else if (tool === 'zone') {
+    zoneDraft.push([p.lng, p.lat]); renderDraft();
+  }
+});
+$('#plist').onclick = e => {
+  const row = e.target.closest('.pl'); if (!row || !isHost() || room.status !== 'lobby') return;
+  const p = room.players[row.dataset.id]; if (!p) return;
+  update(rRef(`players/${row.dataset.id}`), { role: p.role === 'runner' ? 'hunter' : 'runner' });
+};
+$('#randBtn').onclick = () => {
+  const ids = shuffle(players().map(([id]) => id)), n = ids.length;
+  const k = n <= 2 ? 1 : Math.max(1, Math.round(n / 3));
+  const upd = {}; ids.forEach((id, i) => upd[`players/${id}/role`] = i < k ? 'runner' : 'hunter');
+  update(rRef(), upd); toast(`러너 ${k} · 헌터 ${n - k}`);
+};
+$('#startBtn').onclick = async () => {
+  const cfg = room.config, ps = players();
+  const runners = ps.filter(([, p]) => p.role === 'runner'), hunters = ps.filter(([, p]) => p.role === 'hunter');
+  if (!runners.length || !hunters.length) return alert('러너와 헌터가 최소 1명씩 필요해요');
+  const cands = Object.keys(cfg.candidates || {});
+  if (cands.length < cfg.winCount) return alert(`체크포인트 후보를 ${cfg.winCount}곳 이상 찍어주세요 (지금 ${cands.length}곳)`);
+  if (!cfg.start) return alert('시작 지점을 찍어주세요');
+  const far = ps.filter(([, p]) => !(p.lat != null && dist(p, cfg.start) <= cfg.startR));
+  if (far.length && !confirm(`${far.map(([, p]) => p.name).join(', ')} 님이 시작 지점 ${cfg.startR}m 밖이에요. 그래도 시작할까요?`)) return;
+  const t = now();
+  const upd = { status: 'playing', winner: null, visited: null, 'config/real': shuffle(cands).slice(0, cfg.winCount), startedAt: t, huntStartAt: t + cfg.headStartSec * 1000, endAt: t + cfg.durationMin * 60000 };
+  ps.forEach(([id]) => Object.assign(upd, { [`players/${id}/caught`]: false, [`players/${id}/caughtAt`]: null, [`players/${id}/rescues`]: 0, [`players/${id}/out`]: false, [`players/${id}/eliminated`]: false }));
+  tool = null;
+  await update(rRef(), upd);
+};
+
+// ====== game ======
+function onGameStart() {
+  pingSnap = {}; lastPingIdx = 0; checkin = { cp: null, since: 0 }; outSince = null; distHist = []; ending = false;
+  fitZone(); keepAwake();
+  toast(me() && me().role === 'runner' ? '🏃 도망쳐! 헌터는 2분 뒤 출발' : '🔪 2분 대기 후 추격 시작');
+}
+async function keepAwake() { try { if ('wakeLock' in navigator && (!wakeLock || wakeLock.released)) wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {} }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && room && room.status === 'playing') keepAwake(); });
+document.addEventListener('click', () => { if (room && room.status === 'playing') keepAwake(); });
+
+$('#caughtBtn').onclick = () => { if (confirm('헌터에게 터치당했나요?')) update(meRef(), { caught: true, caughtAt: now() }); };
+$('#rescueBtn').onclick = () => {
+  const m = me(); if (!m) return;
+  if ((m.rescues || 0) >= 1) return alert('구출은 1인당 한 번만 받을 수 있어요');
+  if (confirm('동료가 25m 안에서 15초 머문 뒤 터치했나요?')) update(meRef(), { caught: false, caughtAt: null, rescues: 1, immuneUntil: now() + 30000 });
+};
+$('#soundBtn').onclick = () => {
+  try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); audioCtx.resume(); } catch (e) {}
+  soundOn = !soundOn;
+  $('#soundBtn').textContent = soundOn ? '🎧 심장소리 켬' : '🎧 심장소리 끔';
+  if (soundOn) thump();
+};
+$('#compassBtn').onclick = async () => {
+  try {
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+      if (await DeviceOrientationEvent.requestPermission() !== 'granted') return;
+    }
+    window.addEventListener('deviceorientationabsolute', onOri, true);
+    window.addEventListener('deviceorientation', onOri, true);
+    $('#compassBtn').classList.add('hide');
+  } catch (e) { alert('나침반을 켤 수 없어요'); }
+};
+function onOri(e) {
+  if (e.webkitCompassHeading != null) heading = e.webkitCompassHeading;
+  else if (e.absolute && e.alpha != null) heading = 360 - e.alpha;
+  updateCompass();
+}
+let compassBearing = null;
+function updateCompass() {
+  if (compassBearing == null) { $('#arrow').style.transform = ''; $('#arrow').textContent = '·'; return; }
+  $('#arrow').textContent = '⬆';
+  $('#arrow').style.transform = `rotate(${compassBearing - (heading || 0)}deg)`;
+}
+
+// heartbeat
+function setBeat(period) {
+  if (period === beatPeriod) return;
+  beatPeriod = period; clearInterval(beatTimer);
+  const pulse = $('#pulse');
+  if (!period) { pulse.classList.remove('on'); return; }
+  pulse.style.setProperty('--beat', period + 'ms'); pulse.classList.add('on');
+  beatTimer = setInterval(() => {
+    if (soundOn) thump();
+    if (navigator.vibrate) navigator.vibrate([60, 110, 40]);
+  }, period);
+}
+function thump() {
+  if (!audioCtx) return;
+  const t = audioCtx.currentTime;
+  [0, 0.17].forEach((dt, i) => {
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = 'sine'; o.frequency.value = i ? 48 : 62;
+    g.gain.setValueAtTime(0.0001, t + dt);
+    g.gain.exponentialRampToValueAtTime(i ? 0.6 : 0.95, t + dt + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dt + 0.16);
+    o.connect(g).connect(audioCtx.destination); o.start(t + dt); o.stop(t + dt + 0.2);
+  });
+}
+
+function tick() {
+  if (!room || room.status !== 'playing') return;
+  const cfg = room.config, m = me(), t = now();
+  if (!m) return;
+  const ps = players();
+  const runners = ps.filter(([, p]) => p.role === 'runner');
+  const pingMs = cfg.pingSec * 1000;
+
+  // 구역 이탈 (전원)
+  if (myPos && !m.caught && cfg.zone) {
+    const inside = inPoly(myPos, cfg.zone) || edgeDist(myPos, cfg.zone) <= cfg.zoneBuffer;
+    if (!inside) {
+      if (!outSince) outSince = t;
+      const left = cfg.outGraceSec - (t - outSince) / 1000;
+      if (left > 0) banner(`⚠️ 구역 밖! ${Math.ceil(left)}초 안에 돌아오세요`);
+      else { banner('🚨 구역 밖 — 내 위치가 상대 팀에 실시간 공개 중'); if (!m.out) update(meRef(), { out: true }); }
+    } else { if (outSince || m.out) { outSince = null; banner(''); if (m.out) update(meRef(), { out: false }); } }
+  }
+
+  if (m.role === 'runner') {
+    // 감옥 시간 초과
+    if (m.caught && !m.eliminated && t > m.caughtAt + cfg.jailSec * 1000) update(meRef(), { eliminated: true });
+    // 체크인
+    const visited = room.visited || {}, cands = cfg.candidates || {};
+    const target = !m.caught && myPos ? (cfg.real || []).find(id => !visited[id] && cands[id] && dist(myPos, cands[id]) <= cfg.checkinR) : null;
+    if (!target) { checkin.cp = null; $('#checkBar').style.width = '0'; }
+    else {
+      if (checkin.cp !== target) checkin = { cp: target, since: t };
+      const el = (t - checkin.since) / 1000;
+      $('#checkBar').style.width = Math.min(100, el / cfg.checkinSec * 100) + '%';
+      $('#checkLbl').textContent = `체크인 중… ${Math.max(0, Math.ceil(cfg.checkinSec - el))}초`;
+      if (el >= cfg.checkinSec) { set(rRef('visited/' + target), { by: myId, at: t }); checkin.cp = null; toast('✅ 체크포인트 확보!'); }
+    }
+    if (!target) $('#checkLbl').textContent = '진짜 체크포인트(초록 네모) 20m 안에서 30초 머무르면 확보';
+    // 심장소리: 가장 가까운 헌터
+    let d = Infinity;
+    if (myPos && !m.caught) ps.forEach(([, p]) => { if (p.role === 'hunter' && p.lat != null) d = Math.min(d, dist(myPos, p)); });
+    if (t < room.huntStartAt) d = Infinity;
+    distHist.push(d); if (distHist.length > 3) distHist.shift();
+    const avg = distHist.reduce((a, b) => a + b, 0) / distHist.length;
+    setBeat(avg <= 15 ? 450 : avg <= 30 ? 750 : avg <= 50 ? 1150 : 0);
+  } else {
+    setBeat(0);
+    // 위치 핑
+    if (t >= room.huntStartAt) {
+      const idx = Math.floor((t - room.huntStartAt) / pingMs);
+      if (idx >= 1 && idx !== lastPingIdx) {
+        lastPingIdx = idx; pingSnap = {};
+        runners.forEach(([id, p]) => { if (p.lat != null && !p.eliminated) pingSnap[id] = { lng: p.lng, lat: p.lat, name: p.name, at: t }; });
+        toast('📡 러너 위치 공개');
+      }
+    }
+    // 나침반: 가장 가까운 활동 중 러너
+    let best = null, bd = Infinity;
+    if (myPos) runners.forEach(([, p]) => { if (!p.caught && p.lat != null) { const dd = dist(myPos, p); if (dd < bd) { bd = dd; best = p; } } });
+    compassBearing = best && t >= room.huntStartAt ? brg(myPos, best) : null;
+    $('#compassLbl').textContent = compassBearing == null ? '추적 대상 없음' : (heading == null ? '가장 가까운 러너 방향 (화면 위쪽 = 북쪽)' : '가장 가까운 러너 방향');
+    updateCompass();
+  }
+
+  // 승패 판정 (방장)
+  if (isHost() && !ending) {
+    const vN = Object.keys(room.visited || {}).length;
+    let w = null;
+    if (vN >= cfg.winCount) w = 'runner';
+    else if (runners.length && runners.every(([, p]) => p.caught)) w = 'hunter';
+    else if (t >= room.endAt) w = 'hunter';
+    if (w) { ending = true; update(rRef(), { status: 'ended', winner: w, endedAt: t }); }
+  }
+}
+setInterval(() => { tick(); render(); }, 1000);
+
+// ====== render ======
+function render() {
+  const seen = new Set();
+  if (!room) { cleanup(seen); return; }
+  const cfg = room.config || {}, m = me() || {}, st = room.status, t = now();
+  const role = m.role, ps = players();
+  if (mapReady) map.getSource('zone').setData(zoneGeo(cfg.zone));
+
+  show('#lobby', st === 'lobby');
+  show('#gamePanel', st === 'playing');
+  show('#result', st === 'ended');
+  show('#hud', st !== 'lobby' || true);
+  if (myPos) setM('me', myPos, 'me', '나', seen);
+
+  // HUD
+  let hud = `<span class="pill ${role ? 'role-' + role : ''}">${role === 'runner' ? '러너' : role === 'hunter' ? '헌터' : '-'}</span>`;
+  if (st === 'playing') {
+    const vN = Object.keys(room.visited || {}).length;
+    hud += t < room.huntStartAt ? `<span class="pill">헌터 출발 ${fmt(room.huntStartAt - t)}</span>` : `<span class="pill">⏱ ${fmt(room.endAt - t)}</span>`;
+    hud += `<span class="pill">🏁 ${vN}/${cfg.winCount}</span>`;
+    if (t >= room.huntStartAt) {
+      const pingMs = cfg.pingSec * 1000, idx = Math.floor((t - room.huntStartAt) / pingMs);
+      hud += `<span class="pill">${role === 'runner' ? '노출까지' : '다음 핑'} ${fmt(room.huntStartAt + pingMs * (idx + 1) - t)}</span>`;
+    }
+  } else if (st === 'lobby') hud += `<span class="pill">대기실 · ${ps.length}명</span>`;
+  $('#hud').innerHTML = hud;
+
+  if (st === 'lobby') {
+    $('#codeLbl').textContent = roomCode;
+    const host = isHost();
+    show('#hostTools', host); show('#hostBtns', host); show('#waitLbl', !host);
+    document.querySelectorAll('[data-tool]').forEach(b => b.classList.toggle('on', b.dataset.tool === tool));
+    show('#zoneActs', tool === 'zone');
+    $('#toolHint').textContent = tool === 'cp' ? '지도를 탭해 후보 추가 · 기존 후보 근처를 탭하면 삭제' : tool === 'start' ? '지도에서 시작 지점을 탭하세요' : tool === 'zone' ? '경계 꼭짓점을 순서대로 탭한 뒤 [구역 완료]' : '참가자를 탭하면 러너/헌터가 바뀌어요';
+    const nC = Object.keys(cfg.candidates || {}).length;
+    $('#cfgLbl').textContent = `체크포인트 후보 ${nC}곳 중 진짜 ${cfg.winCount}곳 · 핑 ${cfg.pingSec}초 · ${cfg.durationMin}분${cfg.start ? '' : ' · 시작 지점 미지정'}`;
+    $('#plist').innerHTML = ps.map(([id, p]) => {
+      const d = cfg.start && p.lat != null ? dist(p, cfg.start) : null;
+      return `<div class="pl" data-id="${id}"><span class="chip ${p.role}">${p.role === 'runner' ? '러너' : '헌터'}</span><span class="pn">${esc(p.name)}${id === room.host ? ' 👑' : ''}${id === myId ? ' (나)' : ''}</span><span class="pd">${d == null ? '—' : Math.round(d) + 'm'} ${d != null && d <= cfg.startR ? '✅' : ''}</span></div>`;
+    }).join('');
+    Object.entries(cfg.candidates || {}).forEach(([id, c]) => setM('c_' + id, c, 'cand', '', seen));
+    if (cfg.start) setM('start', cfg.start, 'start', '시작', seen);
+    ps.forEach(([id, p]) => { if (id !== myId) setM('p_' + id, p, p.role, p.name, seen); });
+    show('#jail', false); show('#blackout', false);
+  }
+
+  if (st === 'playing') {
+    const cands = cfg.candidates || {}, visited = room.visited || {};
+    show('#runnerUI', role === 'runner'); show('#hunterUI', role === 'hunter');
+    show('#blackout', role === 'hunter' && t < room.huntStartAt);
+    if (role === 'hunter') $('#boTimer').textContent = fmt(room.huntStartAt - t);
+    // 감옥
+    const jailed = role === 'runner' && m.caught;
+    show('#jail', jailed);
+    if (jailed) {
+      $('#jailTimer').textContent = m.eliminated ? '탈락' : fmt(m.caughtAt + cfg.jailSec * 1000 - t);
+      show('#rescueBtn', !m.eliminated && (m.rescues || 0) < 1);
+      $('#jailInfo').textContent = m.eliminated ? '관전 중 (자기 팀만 보여요)' : (m.rescues ? '이미 한 번 구출받았어요' : '동료가 와서 터치하면 아래 버튼을 누르세요');
+    }
+    if (m.immuneUntil && t < m.immuneUntil) banner(`🛡 무적 ${Math.ceil((m.immuneUntil - t) / 1000)}초`);
+
+    if (role === 'runner') {
+      (cfg.real || []).forEach(id => { if (cands[id]) setM('c_' + id, cands[id], visited[id] ? 'done' : 'cp', visited[id] ? '확보' : '', seen); });
+      ps.forEach(([id, p]) => {
+        if (id === myId) return;
+        if (p.role === 'runner') setM('p_' + id, p, p.caught ? 'jail' : 'runner', p.name + (p.caught ? ' ⛓' : ''), seen);
+        else if (p.out) setM('p_' + id, p, 'out', p.name + ' (이탈)', seen);
+      });
+    } else {
+      Object.entries(cands).forEach(([id, c]) => setM('c_' + id, c, 'cand', '', seen));
+      ps.forEach(([id, p]) => {
+        if (id === myId) return;
+        if (p.role === 'hunter') setM('p_' + id, p, 'hunter', p.name, seen);
+        else if (p.caught) setM('p_' + id, p, 'jail', p.name + ' ⛓', seen);
+        else if (p.out) setM('p_' + id, p, 'out', p.name + ' (이탈)', seen);
+      });
+      Object.entries(pingSnap).forEach(([id, s]) => {
+        const p = room.players[id];
+        if (p && !p.caught && !p.out) setM('s_' + id, s, 'ping', `${s.name} · ${Math.round((t - s.at) / 1000)}초 전`, seen);
+      });
+    }
+  }
+
+  if (st === 'ended') {
+    show('#jail', false); show('#blackout', false); setBeat(0); banner('');
+    const runners = ps.filter(([, p]) => p.role === 'runner');
+    $('#resTitle').textContent = room.winner === 'runner' ? '🏃 러너팀 승리!' : '🔪 헌터팀 승리!';
+    $('#resInfo').textContent = `체크포인트 ${Object.keys(room.visited || {}).length}/${cfg.winCount} · 잡힌 러너 ${runners.filter(([, p]) => p.caught).length}/${runners.length}`;
+    show('#againBtn', isHost()); show('#againWait', !isHost());
+    ps.forEach(([id, p]) => { if (id !== myId) setM('p_' + id, p, p.role, p.name, seen); });
+  }
+  cleanup(seen);
+}
+function cleanup(seen) {
+  Object.keys(markers).forEach(k => { if (!seen.has(k)) { markers[k].remove(); delete markers[k]; } });
+}
+$('#againBtn').onclick = () => update(rRef(), { status: 'lobby', winner: null, visited: null });
+</script>
+</body>
+</html>
