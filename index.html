@@ -100,6 +100,9 @@ button.on{outline:2px solid var(--acc)}
 .mk.cand .dot{background:var(--acc);color:#3a2a00;opacity:.9}
 .mk.done .dot{background:#2b313c;color:var(--run)}
 .mk.cp{filter:drop-shadow(0 0 6px rgba(46,229,157,.8))}
+.mk.later{filter:none}
+.mk.later .dot{background:#1f5a44;color:#9fe9c9}
+.mk.later::before{display:none}
 .mk.cp::before{content:'';position:absolute;left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:2px solid var(--run);animation:ring 1.8s ease-out infinite}
 @keyframes ring{from{transform:scale(1);opacity:.9}to{transform:scale(2.8);opacity:0}}
 .aim{width:120px;height:120px;pointer-events:none}
@@ -137,7 +140,7 @@ button.on{outline:2px solid var(--acc)}
   <h2>MANHUNT</h2>
   <p>실제 동네에서 하는 GPS 술래잡기. 러너는 미션을 깨며 도망치고, 헌터는 폰으로 추적해서 잡아요.</p>
   <h3>🏃 러너 승리</h3>
-  <p>지도의 <b>진짜 체크포인트</b>(초록 육각형 신호기)를 모두 방문하면 승리. 체크포인트 20m 안에서 30초 머물면 확보돼요.</p>
+  <p>지도의 <b>진짜 체크포인트</b>(초록 육각형 신호기)를 <b>1번부터 순서대로</b> 모두 켜면 승리. 지금 켤 차례인 신호기만 반짝이고, 20m 안에서 30초 머물면 확보돼요. 순서는 러너팀 공용이에요.</p>
   <h3>🔪 헌터 승리</h3>
   <p>러너를 <b>모두 잡거나</b>, 제한 시간 안에 러너가 체크포인트를 다 못 모으면 승리.</p>
   <h3>⏱ 진행</h3>
@@ -147,7 +150,7 @@ button.on{outline:2px solid var(--acc)}
   <h3>💓 러너가 아는 것</h3>
   <ul><li>진짜 체크포인트 위치</li><li>심장소리: 헌터가 50m 안에 오면 화면이 붉게 뛰고, 가까울수록 빨라져요 (소리는 이어폰 켰을 때만)</li></ul>
   <h3>⛓ 잡기와 구출</h3>
-  <ul><li>헌터가 러너를 <b>실제로 터치</b>하면, 러너는 "👁 내 코드" 4자리를 보여줘요 → 헌터가 🔒 잡기에 입력하면 잡힘</li><li>잡힌 러너는 그 자리에서 대기. 감옥 화면에 구출 코드가 떠요</li><li>동료 러너가 와서 터치하고 구출 코드를 🤝 구출에 입력하면 부활 (1인 1회, 5분 넘으면 탈락)</li><li>코드는 쓸 때마다 새로 바뀌어요. 입력하는 사람이 근처(약 40m)에 있어야 통해요</li><li>구출 직후 두 사람 모두 30초 무적</li></ul>
+  <ul><li>헌터가 러너를 <b>실제로 터치</b>하면, 러너는 "👁 내 코드" 4자리를 보여줘요 → 헌터가 🔒 잡기에 입력하면 잡힘</li><li>잡힌 러너는 그 자리에서 대기</li><li>동료 러너가 와서 터치하면 "🔑 구출 코드 보기" → 동료가 🤝 구출에 입력하면 부활 (1인 1회, 5분 넘으면 탈락)</li><li>코드는 <b>보기를 누를 때마다 새로 발급</b>되고 30초만 유효해요. 미리 봐두고 채팅으로 보내는 꼼수는 안 통해요. 입력하는 사람도 근처(약 40m)에 있어야 해요</li><li>구출 직후 두 사람 모두 30초 무적</li></ul>
   <h3>🚧 규칙</h3>
   <ul><li>빨간 선 구역 밖으로 나가면 내 위치가 상대에게 실시간 공개</li><li>건물 안(로비·엘리베이터·주차장) 진입 금지</li><li>차도는 횡단보도로만</li><li>💬 팀 채팅: 같은 팀에게만 보여요 (전화·카톡도 자유)</li><li>📸 도발: 러너는 사진을 찍어 헌터 전원에게 보낼 수 있어요 (1분에 1번). 단, 배경으로 위치가 들킬 수 있어요!</li><li>📶 GPS 표시가 "약함"이면 위치가 수십 m 튈 수 있어요. 고층 빌딩 사이보다 트인 곳에서 정확해요</li><li>게임 중엔 화면을 켜두세요</li></ul>
   <h3>👑 방장 준비</h3>
@@ -229,6 +232,7 @@ button.on{outline:2px solid var(--acc)}
   <div class="big" id="jailTimer">5:00</div>
   <div class="mut" id="jailInfo"></div>
   <div class="myCode" id="jailCode"></div>
+  <button id="jailCodeBtn" class="go">🔑 구출 코드 보기</button>
 </div>
 
 <!-- BLACKOUT (hunter head start) -->
@@ -635,7 +639,7 @@ $('#startBtn').onclick = async () => {
   if (far.length && !confirm(`${far.map(([, p]) => p.name).join(', ')} 님이 시작 지점 ${cfg.startR}m 밖이에요. 그래도 시작할까요?`)) return;
   const t = now();
   const upd = { status: 'playing', winner: null, visited: null, 'config/real': shuffle(cands).slice(0, cfg.winCount), startedAt: t, huntStartAt: t + cfg.headStartSec * 1000, endAt: t + cfg.durationMin * 60000 };
-  ps.forEach(([id]) => Object.assign(upd, { [`players/${id}/caught`]: false, [`players/${id}/caughtAt`]: null, [`players/${id}/rescues`]: 0, [`players/${id}/out`]: false, [`players/${id}/eliminated`]: false, [`players/${id}/immuneUntil`]: null, [`players/${id}/catchCode`]: newCode(), [`players/${id}/rescueCode`]: null }));
+  ps.forEach(([id]) => Object.assign(upd, { [`players/${id}/caught`]: false, [`players/${id}/caughtAt`]: null, [`players/${id}/rescues`]: 0, [`players/${id}/out`]: false, [`players/${id}/eliminated`]: false, [`players/${id}/immuneUntil`]: null, [`players/${id}/catchCode`]: null, [`players/${id}/rescueCode`]: null }));
   tool = null;
   await update(rRef(), upd);
 };
@@ -655,6 +659,7 @@ document.addEventListener('click', () => { if (room && room.status === 'playing'
 // 입력하는 사람이 대상 근처(40m, GPS 오차 감안)에 있어야 통과.
 const CODE_R = 40;
 const newCode = () => String(Math.floor(1000 + Math.random() * 9000));
+const CODE_TTL = 30000; // 보기 누를 때마다 새 코드, 30초만 유효
 let codeAction = null;
 function askCode(title, sub, fn) {
   codeAction = fn; $('#codeTitle').textContent = title; $('#codeSub').textContent = sub;
@@ -673,32 +678,38 @@ const near = p => !myPos || p.lat == null || dist(myPos, p) <= CODE_R;
 $('#catchBtn').onclick = () => {
   if (now() < room.huntStartAt) return toast('아직 추격 시작 전이에요');
   askCode('🔒 잡기', '터치한 러너의 "내 코드" 4자리', async c => {
-    const hit = players().find(([, p]) => p.role === 'runner' && !p.caught && p.catchCode === c);
+    const hit = players().find(([, p]) => p.role === 'runner' && !p.caught && p.catchCode === c && now() < (p.catchExp || 0));
     if (!hit) return toast('❌ 코드가 틀렸어요');
     const [id, p] = hit;
     if (p.immuneUntil && now() < p.immuneUntil) return toast(`🛡 ${p.name} 무적 중!`);
     if (!near(p)) return toast('❌ 너무 멀어요. 직접 가서 잡으세요');
-    await update(rRef(`players/${id}`), { caught: true, caughtAt: now(), caughtBy: myId, catchCode: null, rescueCode: newCode() });
+    await update(rRef(`players/${id}`), { caught: true, caughtAt: now(), caughtBy: myId, catchCode: null, catchExp: null, rescueCode: null, rescueExp: null });
     toast(`⛓ ${p.name} 잡았다!`);
   });
 };
 $('#rescueGoBtn').onclick = () => {
   askCode('🤝 구출', '감옥에 있는 동료 화면의 구출 코드', async c => {
-    const hit = players().find(([id, p]) => id !== myId && p.role === 'runner' && p.caught && !p.eliminated && p.rescueCode === c);
+    const hit = players().find(([id, p]) => id !== myId && p.role === 'runner' && p.caught && !p.eliminated && p.rescueCode === c && now() < (p.rescueExp || 0));
     if (!hit) return toast('❌ 코드가 틀렸어요');
     const [id, p] = hit;
     if ((p.rescues || 0) >= 1) return toast('이미 한 번 구출된 동료예요');
     if (!near(p)) return toast('❌ 너무 멀어요. 직접 가서 터치하세요');
     const until = now() + 30000;
-    await update(rRef(), { [`players/${id}/caught`]: false, [`players/${id}/caughtAt`]: null, [`players/${id}/rescues`]: 1, [`players/${id}/immuneUntil`]: until, [`players/${id}/rescueCode`]: null, [`players/${id}/catchCode`]: newCode(), [`players/${myId}/immuneUntil`]: until });
+    await update(rRef(), { [`players/${id}/caught`]: false, [`players/${id}/caughtAt`]: null, [`players/${id}/rescues`]: 1, [`players/${id}/immuneUntil`]: until, [`players/${id}/rescueCode`]: null, [`players/${id}/catchCode`]: null, [`players/${myId}/immuneUntil`]: until });
     toast(`🤝 ${p.name} 구출 성공! 둘 다 30초 무적`);
   });
 };
 let codeHideT;
 $('#showCodeBtn').onclick = () => {
-  const m = me(); if (!m || !m.catchCode) return;
-  $('#showCodeBtn').innerHTML = `<span class="myCode" style="font-size:22px;letter-spacing:4px">${m.catchCode}</span>`;
-  clearTimeout(codeHideT); codeHideT = setTimeout(() => $('#showCodeBtn').textContent = '👁 내 코드', 10000);
+  const m = me(); if (!m || m.caught) return;
+  const c = newCode(), exp = now() + CODE_TTL;
+  update(meRef(), { catchCode: c, catchExp: exp }); // 보기 = 새 코드 발급, 이전 코드는 즉시 무효
+  $('#showCodeBtn').innerHTML = `<span class="myCode" style="font-size:22px;letter-spacing:4px">${c}</span>`;
+  clearTimeout(codeHideT); codeHideT = setTimeout(() => $('#showCodeBtn').textContent = '👁 내 코드', CODE_TTL);
+};
+$('#jailCodeBtn').onclick = () => {
+  const m = me(); if (!m || !m.caught || m.eliminated || (m.rescues || 0) >= 1) return;
+  update(meRef(), { rescueCode: newCode(), rescueExp: now() + CODE_TTL });
 };
 $('#soundBtn').onclick = () => {
   try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); audioCtx.resume(); } catch (e) {}
@@ -780,7 +791,8 @@ function tick() {
     if (m.caught && !m.eliminated && t > m.caughtAt + cfg.jailSec * 1000) update(meRef(), { eliminated: true });
     // 체크인
     const visited = room.visited || {}, cands = cfg.candidates || {};
-    const target = !m.caught && myPos ? (cfg.real || []).find(id => !visited[id] && cands[id] && dist(myPos, cands[id]) <= cfg.checkinR + Math.min(15, Math.max(0, (rawAcc || 0) - 10))) : null;
+    const order = cfg.real || [], nextIdx = order.findIndex(id => !visited[id]), nextId = order[nextIdx];
+    const target = !m.caught && myPos && nextId && cands[nextId] && dist(myPos, cands[nextId]) <= cfg.checkinR + Math.min(15, Math.max(0, (rawAcc || 0) - 10)) ? nextId : null;
     if (!target) { checkin.cp = null; $('#checkBar').style.width = '0'; }
     else {
       if (checkin.cp !== target) checkin = { cp: target, since: t };
@@ -789,7 +801,7 @@ function tick() {
       $('#checkLbl').textContent = `체크인 중… ${Math.max(0, Math.ceil(cfg.checkinSec - el))}초`;
       if (el >= cfg.checkinSec) { set(rRef('visited/' + target), { by: myId, at: t }); checkin.cp = null; toast('✅ 체크포인트 확보!'); }
     }
-    if (!target) $('#checkLbl').textContent = '초록 신호기 원 안(20m)에서 30초 머무르면 확보';
+    if (!target) $('#checkLbl').textContent = nextId ? `다음: ${nextIdx + 1}번 신호기 — 원 안에서 30초 머무르면 확보` : '모든 신호기 확보!';
     // 심장소리: 가장 가까운 헌터
     let d = Infinity;
     if (myPos && !m.caught) ps.forEach(([, p]) => { if (p.role === 'hunter' && p.lat != null) d = Math.min(d, dist(myPos, p)); });
@@ -840,7 +852,8 @@ function render() {
   if (mapReady) {
     map.getSource('zone').setData(zoneGeo(cfg.zone));
     const cands = cfg.candidates || {}, visited = room.visited || {};
-    const circ = st === 'playing' && role === 'runner' ? (cfg.real || []).filter(id => cands[id] && !visited[id]).map(id => circle(cands[id], cfg.checkinR)) : [];
+    const nx = (cfg.real || []).find(id => !visited[id]);
+    const circ = st === 'playing' && role === 'runner' && nx && cands[nx] ? [circle(cands[nx], cfg.checkinR)] : [];
     map.getSource('cpzone').setData({ type: 'FeatureCollection', features: circ });
   }
 
@@ -894,15 +907,18 @@ function render() {
     if (jailed) {
       $('#jailTimer').textContent = m.eliminated ? '탈락' : fmt(m.caughtAt + cfg.jailSec * 1000 - t);
       const canRescue = !m.eliminated && (m.rescues || 0) < 1;
-      $('#jailCode').textContent = canRescue ? (m.rescueCode || '') : '';
-      $('#jailInfo').textContent = m.eliminated ? '관전 중 (자기 팀만 보여요)' : (canRescue ? '구출 코드 — 동료가 와서 터치하면 이 코드를 보여주세요' : '이미 한 번 구출받아서 더 이상 구출될 수 없어요');
+      const codeLive = canRescue && m.rescueCode && t < (m.rescueExp || 0);
+      $('#jailCode').textContent = codeLive ? `${m.rescueCode}` : '';
+      show('#jailCodeBtn', canRescue && !codeLive);
+      $('#jailInfo').textContent = m.eliminated ? '관전 중 (자기 팀만 보여요)' : !canRescue ? '이미 한 번 구출받아서 더 이상 구출될 수 없어요' : codeLive ? `구출 코드 · ${Math.ceil((m.rescueExp - t) / 1000)}초 남음` : '동료가 와서 터치하면 코드를 보여주세요';
     }
     show('#runnerActs', role === 'runner' && !m.caught);
     if (m.immuneUntil && t < m.immuneUntil) { banner(`🛡 무적 ${Math.ceil((m.immuneUntil - t) / 1000)}초`); immuneShown = true; }
     else if (immuneShown) { immuneShown = false; banner(''); }
 
     if (role === 'runner') {
-      (cfg.real || []).forEach((id, i) => { if (cands[id]) setM('c_' + id, cands[id], visited[id] ? 'done' : 'cp', visited[id] ? '확보' : '', seen, visited[id] ? '✓' : String(i + 1)); });
+      const nx2 = (cfg.real || []).find(id => !visited[id]);
+      (cfg.real || []).forEach((id, i) => { if (cands[id]) setM('c_' + id, cands[id], visited[id] ? 'done' : id === nx2 ? 'cp' : 'cp later', visited[id] ? '확보' : id === nx2 ? '다음' : '', seen, visited[id] ? '✓' : String(i + 1)); });
       ps.forEach(([id, p]) => {
         if (id === myId) return;
         if (p.role === 'runner') setM('p_' + id, p, p.caught ? 'jail' : 'runner', p.name + (p.caught ? ' ⛓' : ''), seen);
