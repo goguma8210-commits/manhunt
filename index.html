@@ -46,6 +46,25 @@ button.on{outline:2px solid var(--acc)}
 .pill.role-runner{background:var(--run);color:#06231a}
 .pill.role-hunter{background:var(--hunt);color:#fff}
 #banner{position:fixed;left:12px;right:12px;top:calc(56px + env(safe-area-inset-top));z-index:12;background:#ff9f1c;color:#1a1000;font-weight:800;padding:10px 12px;border-radius:12px;text-align:center}
+/* chat */
+#chatBtn{position:fixed;right:12px;bottom:calc(var(--sheetH,200px) + 12px);z-index:11;width:54px;height:54px;border-radius:50%;padding:0;font-size:24px;background:var(--panel)}
+#chatBtn .badge{position:absolute;top:-2px;right:-2px;min-width:20px;height:20px;border-radius:10px;background:var(--hunt);color:#fff;font-size:12px;line-height:20px;padding:0 5px}
+#tauntBtn{position:fixed;right:12px;bottom:calc(var(--sheetH,200px) + 76px);z-index:11;width:54px;height:54px;border-radius:50%;padding:0;font-size:24px;background:var(--panel)}
+#chat{position:fixed;left:0;right:0;bottom:0;top:30%;z-index:22;background:#0f1218;border-radius:18px 18px 0 0;display:flex;flex-direction:column;box-shadow:0 -6px 30px rgba(0,0,0,.6)}
+#chat .hd{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line);font-weight:800}
+#msgs{flex:1;overflow:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:80%;padding:8px 12px;border-radius:14px;background:#1c212b;font-size:15px;line-height:1.4;word-break:break-word}
+.msg.mine{align-self:flex-end;background:var(--blue);color:#fff}
+.msg .who{font-size:11px;color:var(--mut);margin-bottom:2px;font-weight:700}
+.msg.sys{align-self:center;background:transparent;color:var(--mut);font-size:12px}
+.quick{display:flex;gap:6px;overflow-x:auto;padding:8px 12px 0}
+.quick button{flex:0 0 auto;padding:7px 11px;font-size:13px;border-radius:999px}
+#chat form{display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
+#chat form input{flex:1;padding:12px}
+#tauntView{position:fixed;inset:0;z-index:35;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center}
+#tauntView img{max-width:100%;max-height:62vh;border-radius:14px;border:3px solid var(--run);transform:rotate(-2deg)}
+#tauntView .t{font-size:22px;font-weight:900;color:var(--run)}
+.gps{font-size:12px}
 #toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);z-index:25;background:rgba(0,0,0,.85);padding:14px 20px;border-radius:14px;font-weight:800;font-size:17px;pointer-events:none;opacity:0;transition:opacity .3s}
 #toast.show{opacity:1}
 /* checkin bar */
@@ -123,7 +142,7 @@ button.on{outline:2px solid var(--acc)}
   <h3>⛓ 잡기와 구출</h3>
   <ul><li>헌터가 러너를 <b>실제로 터치</b>하면 잡힘 → 러너가 "잡혔음" 버튼</li><li>잡힌 러너는 그 자리에서 대기</li><li>동료 러너가 와서 터치하면 부활 (1인 1회, 5분 넘으면 탈락)</li><li>구출 직후 30초 무적</li></ul>
   <h3>🚧 규칙</h3>
-  <ul><li>빨간 선 구역 밖으로 나가면 내 위치가 상대에게 실시간 공개</li><li>건물 안(로비·엘리베이터·주차장) 진입 금지</li><li>차도는 횡단보도로만</li><li>같은 팀끼리 전화·카톡 자유</li><li>게임 중엔 화면을 켜두세요</li></ul>
+  <ul><li>빨간 선 구역 밖으로 나가면 내 위치가 상대에게 실시간 공개</li><li>건물 안(로비·엘리베이터·주차장) 진입 금지</li><li>차도는 횡단보도로만</li><li>💬 팀 채팅: 같은 팀에게만 보여요 (전화·카톡도 자유)</li><li>📸 도발: 러너는 사진을 찍어 헌터 전원에게 보낼 수 있어요 (1분에 1번). 단, 배경으로 위치가 들킬 수 있어요!</li><li>📶 GPS 표시가 "약함"이면 위치가 수십 m 튈 수 있어요. 고층 빌딩 사이보다 트인 곳에서 정확해요</li><li>게임 중엔 화면을 켜두세요</li></ul>
   <h3>👑 방장 준비</h3>
   <ul><li>⬡ 구역 설정: 지도를 탭해 꼭짓점을 차례로 찍기 (↩︎로 하나씩 취소)</li><li>체크포인트 후보: 지도를 탭해 추가 (다시 탭하면 삭제)</li><li>시작 지점: 지도를 탭해 지정</li><li>참가자를 탭하면 러너/헌터 전환, 🎲로 랜덤 배정</li></ul>
 </div>
@@ -173,6 +192,23 @@ button.on{outline:2px solid var(--acc)}
   </div>
 </div>
 
+<!-- CHAT / TAUNT -->
+<button id="chatBtn" class="hide">💬<span class="badge hide" id="chatBadge"></span></button>
+<button id="tauntBtn" class="hide">📸</button>
+<input type="file" id="tauntFile" accept="image/*" capture="environment" class="hide">
+<div id="chat" class="hide">
+  <div class="hd"><span id="chatTitle">팀 채팅</span><button class="sm" id="chatClose">닫기</button></div>
+  <div id="msgs"></div>
+  <div class="quick" id="quick"></div>
+  <form id="chatForm"><input id="chatIn" placeholder="팀에게만 보여요" maxlength="200" autocomplete="off"><button class="go" style="flex:0 0 auto">전송</button></form>
+</div>
+<div id="tauntView" class="hide">
+  <div class="t" id="tauntTitle"></div>
+  <img id="tauntImg" alt="">
+  <div class="mut" id="tauntCap"></div>
+  <button id="tauntClose">닫기</button>
+</div>
+
 <!-- JAIL -->
 <div id="jail" class="hide">
   <div>⛓ 감옥</div>
@@ -198,7 +234,7 @@ button.on{outline:2px solid var(--acc)}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, set, update, onValue, get, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, set, update, onValue, get, remove, push, onChildAdded, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 // ====== 1. 여기에 Firebase 설정을 붙여넣으세요 ======
 const firebaseConfig = {
@@ -359,7 +395,9 @@ function ensureGeo() {
     let first = true;
     geoStarted = true;
     navigator.geolocation.watchPosition(p => {
-      myPos = { lng: p.coords.longitude, lat: p.coords.latitude, acc: p.coords.accuracy };
+      const f = filterFix(p.coords.longitude, p.coords.latitude, p.coords.accuracy, p.timestamp);
+      if (!f) return;
+      myPos = f;
       if (!centeredOnce && !(room && room.config && room.config.zone)) { centeredOnce = true; map.jumpTo({ center: [myPos.lng, myPos.lat], zoom: 15.5 }); }
       if (first) { first = false; res(); }
       pushPos();
@@ -367,6 +405,31 @@ function ensureGeo() {
       if (first) { first = false; geoStarted = false; rej(e); } else banner('위치 신호가 약해요: ' + e.message);
     }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
   });
+}
+// ====== GPS 필터 (고층 빌딩 반사로 위치가 튀는 것 완화) ======
+// 칼만 필터: 정확도가 나쁜 측정값일수록 덜 믿고, 사람이 낼 수 없는 속도의 점프는 무시
+let kf = null; // { lng, lat, v(분산 m²), t, raw }
+const RUN_MPS = 4; // 사람이 뛰는 속도 기준
+function filterFix(lng, lat, acc, ts) {
+  acc = Math.max(acc || 50, 3);
+  rawAcc = acc;
+  if (!kf) { kf = { lng, lat, v: acc * acc, t: ts, reject: 0 }; return { lng, lat, acc }; }
+  const dt = Math.max(0.2, (ts - kf.t) / 1000);
+  kf.v += dt * RUN_MPS * RUN_MPS; // 시간이 지날수록 이동 가능성만큼 불확실성 증가
+  const jump = dist({ lng, lat }, kf);
+  // 이번 측정이 정확도 대비 말도 안 되게 멀면(빌딩 반사) 무시 — 단, 3번 연속이면 실제 이동으로 인정
+  if (jump > 3 * Math.sqrt(kf.v + acc * acc) && jump > 30 && ++kf.reject < 3) return { lng: kf.lng, lat: kf.lat, acc: Math.sqrt(kf.v) };
+  kf.reject = 0;
+  const K = kf.v / (kf.v + acc * acc);
+  kf.lng += K * (lng - kf.lng); kf.lat += K * (lat - kf.lat);
+  kf.v = (1 - K) * kf.v; kf.t = ts;
+  return { lng: kf.lng, lat: kf.lat, acc: Math.sqrt(kf.v) };
+}
+let rawAcc = null;
+function gpsGrade() {
+  if (rawAcc == null) return '';
+  const a = Math.round(rawAcc);
+  return a <= 15 ? `<span class="pill gps">📶 GPS 좋음 ±${a}m</span>` : a <= 35 ? `<span class="pill gps" style="color:var(--acc)">📶 GPS 보통 ±${a}m</span>` : `<span class="pill gps" style="color:var(--hunt)">📶 GPS 약함 ±${a}m</span>`;
 }
 function pushPos() {
   if (!roomCode || !myPos || now() - lastWrite < 2000) return;
@@ -416,7 +479,83 @@ function enterRoom(code) {
     render();
   });
   setTimeout(fitZone, 400);
+  listenTaunts();
 }
+
+// ====== 팀 채팅 ======
+let chatTeam = null, chatUnsub = null, unread = 0, chatOpen = false;
+const QUICK = { runner: ['헌터 근처 있음 ⚠️', '신호기 가는 중', '나 잡힘 구해줘', '여기 안전', '갈라지자', '모이자'], hunter: ['여기 막을게', '포위하자', '러너 봤다 👀', '신호기 지키는 중', '감옥 지켜', '반대쪽 간다'] };
+function setChatTeam(team) {
+  if (team === chatTeam) return;
+  if (chatUnsub) chatUnsub();
+  chatTeam = team; unread = 0; $('#msgs').innerHTML = ''; updBadge();
+  if (!team) return;
+  $('#chatTitle').textContent = team === 'runner' ? '🏃 러너 팀 채팅' : '🔪 헌터 팀 채팅';
+  $('#quick').innerHTML = QUICK[team].map(q => `<button type="button" class="sm">${q}</button>`).join('');
+  const since = room.startedAt || 0;
+  chatUnsub = onChildAdded(query(ref(db, `chat/${roomCode}/${team}`), limitToLast(60)), s => {
+    const m = s.val(); if (!m || m.at < since) return;
+    addMsg(m);
+    if (!chatOpen && m.from !== myId) { unread++; updBadge(); if (navigator.vibrate) navigator.vibrate(40); }
+  });
+}
+function addMsg(m) {
+  const el = document.createElement('div');
+  el.className = 'msg' + (m.from === myId ? ' mine' : '');
+  el.innerHTML = (m.from === myId ? '' : `<div class="who">${esc(m.name)}</div>`) + esc(m.text);
+  $('#msgs').appendChild(el); $('#msgs').scrollTop = 1e9;
+}
+function updBadge() { $('#chatBadge').textContent = unread; show('#chatBadge', unread > 0); }
+function sendChat(text) {
+  text = text.trim(); if (!text || !chatTeam) return;
+  push(ref(db, `chat/${roomCode}/${chatTeam}`), { from: myId, name: (me() || {}).name || '', text, at: now() });
+}
+$('#chatBtn').onclick = () => { chatOpen = true; unread = 0; updBadge(); show('#chat', true); $('#msgs').scrollTop = 1e9; };
+$('#chatClose').onclick = () => { chatOpen = false; show('#chat', false); $('#chatIn').blur(); };
+$('#chatForm').onsubmit = e => { e.preventDefault(); sendChat($('#chatIn').value); $('#chatIn').value = ''; };
+$('#quick').onclick = e => { if (e.target.tagName === 'BUTTON') sendChat(e.target.textContent); };
+
+// ====== 📸 도발 (러너 → 헌터 전원) ======
+let lastTaunt = 0, seenTaunts = {};
+$('#tauntBtn').onclick = () => {
+  const left = 60000 - (now() - lastTaunt);
+  if (left > 0) return toast(`도발은 ${Math.ceil(left / 1000)}초 뒤에 다시`);
+  $('#tauntFile').click();
+};
+$('#tauntFile').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  const cap = prompt('한마디 (비워도 돼요)', '잡아봐 ㅋㅋ 😏') || '';
+  try {
+    const img = await shrink(f, 640, 0.6);
+    lastTaunt = now();
+    await push(ref(db, `taunts/${roomCode}`), { from: myId, name: (me() || {}).name || '', img, cap: cap.slice(0, 60), at: now() });
+    toast('📸 헌터들에게 보냄');
+  } catch (err) { alert('사진을 보낼 수 없어요'); }
+};
+function shrink(file, max, q) {
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file), im = new Image();
+    im.onload = () => {
+      const k = Math.min(1, max / Math.max(im.width, im.height));
+      const c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+      res(c.toDataURL('image/jpeg', q));
+    };
+    im.onerror = rej; im.src = url;
+  });
+}
+function listenTaunts() {
+  onChildAdded(query(ref(db, `taunts/${roomCode}`), limitToLast(5)), s => {
+    const t = s.val(); if (!t || seenTaunts[s.key]) return; seenTaunts[s.key] = 1;
+    if (!room || room.status !== 'playing' || t.at < (room.startedAt || 0) || now() - t.at > 120000) return;
+    if ((me() || {}).role !== 'hunter') return;
+    $('#tauntTitle').textContent = `🏃 ${t.name}의 도발`;
+    $('#tauntImg').src = t.img; $('#tauntCap').textContent = t.cap || '';
+    show('#tauntView', true);
+    if (navigator.vibrate) navigator.vibrate([100, 60, 100]);
+  });
+}
+$('#tauntClose').onclick = () => show('#tauntView', false);
 
 // ====== lobby ======
 $('#shareBtn').onclick = async () => {
@@ -581,7 +720,7 @@ function tick() {
     if (m.caught && !m.eliminated && t > m.caughtAt + cfg.jailSec * 1000) update(meRef(), { eliminated: true });
     // 체크인
     const visited = room.visited || {}, cands = cfg.candidates || {};
-    const target = !m.caught && myPos ? (cfg.real || []).find(id => !visited[id] && cands[id] && dist(myPos, cands[id]) <= cfg.checkinR) : null;
+    const target = !m.caught && myPos ? (cfg.real || []).find(id => !visited[id] && cands[id] && dist(myPos, cands[id]) <= cfg.checkinR + Math.min(15, Math.max(0, (rawAcc || 0) - 10))) : null;
     if (!target) { checkin.cp = null; $('#checkBar').style.width = '0'; }
     else {
       if (checkin.cp !== target) checkin = { cp: target, since: t };
@@ -662,6 +801,7 @@ function render() {
       hud += `<span class="pill">${role === 'runner' ? '노출까지' : '다음 핑'} ${fmt(room.huntStartAt + pingMs * (idx + 1) - t)}</span>`;
     }
   } else if (st === 'lobby') hud += `<span class="pill">대기실 · ${ps.length}명</span>`;
+  hud += gpsGrade();
   $('#hud').innerHTML = hud;
 
   if (st === 'lobby') {
@@ -721,6 +861,12 @@ function render() {
   }
 
   if (st !== 'playing' && aimMarker) { aimMarker.remove(); aimMarker = null; }
+  const inGame = st === 'playing';
+  setChatTeam(inGame ? role : null);
+  show('#chatBtn', inGame);
+  show('#tauntBtn', inGame && role === 'runner' && !m.eliminated && t >= room.huntStartAt);
+  if (!inGame) { show('#chat', false); show('#tauntView', false); chatOpen = false; }
+  const gp = $('#gamePanel'); document.documentElement.style.setProperty('--sheetH', (inGame ? gp.offsetHeight : 0) + 'px');
   if (st === 'ended') {
     show('#jail', false); show('#blackout', false); setBeat(0); banner('');
     const runners = ps.filter(([, p]) => p.role === 'runner');
