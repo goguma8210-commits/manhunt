@@ -65,6 +65,10 @@ button.on{outline:2px solid var(--acc)}
 #tauntView img{max-width:100%;max-height:62vh;border-radius:14px;border:3px solid var(--run);transform:rotate(-2deg)}
 #tauntView .t{font-size:22px;font-weight:900;color:var(--run)}
 .gps{font-size:12px}
+#codeBox{position:fixed;inset:0;z-index:45;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;padding:24px}
+#codeBox .in{background:#161a22;border-radius:18px;padding:20px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px;text-align:center}
+#codeBox input{font-size:34px;letter-spacing:12px;text-align:center;font-weight:900}
+.myCode{font-size:44px;font-weight:900;letter-spacing:10px;font-family:ui-monospace,Menlo,monospace}
 #toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);z-index:25;background:rgba(0,0,0,.85);padding:14px 20px;border-radius:14px;font-weight:800;font-size:17px;pointer-events:none;opacity:0;transition:opacity .3s}
 #toast.show{opacity:1}
 /* checkin bar */
@@ -74,12 +78,15 @@ button.on{outline:2px solid var(--acc)}
 #compass{display:flex;align-items:center;gap:14px}
 #arrow{width:64px;height:64px;border-radius:50%;background:#161a22;border:2px solid var(--hunt);display:flex;align-items:center;justify-content:center;font-size:34px;transition:transform .25s}
 /* overlays */
-#blackout,#result,#jail{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center}
+#blackout,#result{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center}
 #blackout{background:#000}
 #blackout .big,#jail .big{font-size:56px;font-weight:900}
 #result{background:rgba(5,6,9,.95)}
 #result h2{font-size:34px;margin:0}
-#jail{background:rgba(20,20,24,.9);z-index:9}
+#jail{position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:12;background:rgba(20,20,24,.94);border:2px solid #555;border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+#jail .big{font-size:34px!important}
+#jail .myCode{font-size:36px}
+.maplibregl-ctrl-top-right{top:calc(56px + env(safe-area-inset-top))}
 #pulse{position:fixed;inset:0;pointer-events:none;z-index:15;opacity:0}
 #pulse.on{animation:beat var(--beat,1000ms) infinite}
 @keyframes beat{0%{opacity:0;box-shadow:inset 0 0 70px 22px rgba(255,20,20,.9)}8%{opacity:1;box-shadow:inset 0 0 70px 22px rgba(255,20,20,.9)}22%{opacity:.25}32%{opacity:.85}100%{opacity:0;box-shadow:inset 0 0 70px 22px rgba(255,20,20,.9)}}
@@ -136,11 +143,11 @@ button.on{outline:2px solid var(--acc)}
   <h3>⏱ 진행</h3>
   <ul><li>시작 지점에 모두 모여서 시작</li><li>러너 먼저 출발, 헌터는 2분간 화면이 꺼진 채 대기</li><li>그다음 추격 시작</li></ul>
   <h3>🧭 헌터가 아는 것</h3>
-  <ul><li>나침반: 지도 위 내 위치 둘레의 빨간 화살표가 가장 가까운 러너 방향을 가리켜요 (지도는 항상 위쪽이 북쪽)</li><li>위치 핑: 90초마다 러너의 정확한 위치</li><li>체크포인트 후보(노란 ? 신호기) — 어느 게 진짜인지는 모름</li></ul>
+  <ul><li>나침반: 지도 위 내 위치 둘레의 빨간 화살표가 가장 가까운 러너 방향을 가리켜요 (지도를 돌려도 맞게 따라가요. 오른쪽 위 나침반 버튼을 누르면 북쪽이 위로)</li><li>위치 핑: 90초마다 러너의 정확한 위치</li><li>체크포인트 후보(노란 ? 신호기) — 어느 게 진짜인지는 모름</li></ul>
   <h3>💓 러너가 아는 것</h3>
   <ul><li>진짜 체크포인트 위치</li><li>심장소리: 헌터가 50m 안에 오면 화면이 붉게 뛰고, 가까울수록 빨라져요 (소리는 이어폰 켰을 때만)</li></ul>
   <h3>⛓ 잡기와 구출</h3>
-  <ul><li>헌터가 러너를 <b>실제로 터치</b>하면 잡힘 → 러너가 "잡혔음" 버튼</li><li>잡힌 러너는 그 자리에서 대기</li><li>동료 러너가 와서 터치하면 부활 (1인 1회, 5분 넘으면 탈락)</li><li>구출 직후 30초 무적</li></ul>
+  <ul><li>헌터가 러너를 <b>실제로 터치</b>하면, 러너는 "👁 내 코드" 4자리를 보여줘요 → 헌터가 🔒 잡기에 입력하면 잡힘</li><li>잡힌 러너는 그 자리에서 대기. 감옥 화면에 구출 코드가 떠요</li><li>동료 러너가 와서 터치하고 구출 코드를 🤝 구출에 입력하면 부활 (1인 1회, 5분 넘으면 탈락)</li><li>코드는 쓸 때마다 새로 바뀌어요. 입력하는 사람이 근처(약 40m)에 있어야 통해요</li><li>구출 직후 두 사람 모두 30초 무적</li></ul>
   <h3>🚧 규칙</h3>
   <ul><li>빨간 선 구역 밖으로 나가면 내 위치가 상대에게 실시간 공개</li><li>건물 안(로비·엘리베이터·주차장) 진입 금지</li><li>차도는 횡단보도로만</li><li>💬 팀 채팅: 같은 팀에게만 보여요 (전화·카톡도 자유)</li><li>📸 도발: 러너는 사진을 찍어 헌터 전원에게 보낼 수 있어요 (1분에 1번). 단, 배경으로 위치가 들킬 수 있어요!</li><li>📶 GPS 표시가 "약함"이면 위치가 수십 m 튈 수 있어요. 고층 빌딩 사이보다 트인 곳에서 정확해요</li><li>게임 중엔 화면을 켜두세요</li></ul>
   <h3>👑 방장 준비</h3>
@@ -184,11 +191,11 @@ button.on{outline:2px solid var(--acc)}
   <div id="runnerUI" class="hide">
     <div class="mut" id="checkLbl">초록 신호기 원 안(20m)에서 30초 머무르면 확보</div>
     <div class="bar"><div id="checkBar"></div></div>
-    <div class="row"><button id="soundBtn">🎧 심장소리 끔</button><button id="caughtBtn" class="primary">잡혔음</button></div>
+    <div class="row" id="runnerActs"><button id="soundBtn">🎧 심장소리 끔</button><button id="showCodeBtn">👁 내 코드</button><button id="rescueGoBtn" class="go">🤝 구출</button></div>
   </div>
   <div id="hunterUI" class="hide">
     <div id="compass"><div id="arrow">⬆</div><div class="mut" id="compassLbl">가장 가까운 러너 방향</div></div>
-    
+    <button id="catchBtn" class="primary">🔒 잡기 (러너 코드 입력)</button>
   </div>
 </div>
 
@@ -209,12 +216,19 @@ button.on{outline:2px solid var(--acc)}
   <button id="tauntClose">닫기</button>
 </div>
 
+<div id="codeBox" class="hide"><div class="in">
+  <div style="font-weight:900;font-size:18px" id="codeTitle"></div>
+  <div class="mut" id="codeSub"></div>
+  <input id="codeEntry" inputmode="numeric" maxlength="4" autocomplete="off" pattern="[0-9]*">
+  <div class="row"><button id="codeCancel">취소</button><button id="codeOk" class="go">확인</button></div>
+</div></div>
+
 <!-- JAIL -->
 <div id="jail" class="hide">
   <div>⛓ 감옥</div>
   <div class="big" id="jailTimer">5:00</div>
-  <div class="mut" id="jailInfo">동료가 와서 터치하면 아래 버튼을 누르세요</div>
-  <button id="rescueBtn" class="go">구출됨</button>
+  <div class="mut" id="jailInfo"></div>
+  <div class="myCode" id="jailCode"></div>
 </div>
 
 <!-- BLACKOUT (hunter head start) -->
@@ -353,7 +367,8 @@ map.on('load', () => {
   map.addSource('zone', { type: 'geojson', data: fc() });
   map.addLayer({ id: 'zone-fill', type: 'fill', source: 'zone', paint: { 'fill-color': '#ff3b3b', 'fill-opacity': 0.06 } });
   map.addLayer({ id: 'zone-line', type: 'line', source: 'zone', paint: { 'line-color': '#ff3b3b', 'line-width': 3 } });
-  map.dragRotate.disable(); map.touchZoomRotate.disableRotation();
+  map.addControl(new maplibregl.NavigationControl({ showZoom: false, visualizePitch: true }), 'top-right');
+  map.on('rotate', () => updateCompass());
   map.addSource('cpzone', { type: 'geojson', data: fc() });
   map.addLayer({ id: 'cpzone-fill', type: 'fill', source: 'cpzone', paint: { 'fill-color': '#2ee59d', 'fill-opacity': 0.12 } });
   map.addLayer({ id: 'cpzone-line', type: 'line', source: 'cpzone', paint: { 'line-color': '#2ee59d', 'line-width': 2, 'line-dasharray': [2, 2] } });
@@ -516,6 +531,7 @@ $('#chatForm').onsubmit = e => { e.preventDefault(); sendChat($('#chatIn').value
 $('#quick').onclick = e => { if (e.target.tagName === 'BUTTON') sendChat(e.target.textContent); };
 
 // ====== 📸 도발 (러너 → 헌터 전원) ======
+let immuneShown = false;
 let lastTaunt = 0, seenTaunts = {};
 $('#tauntBtn').onclick = () => {
   const left = 60000 - (now() - lastTaunt);
@@ -619,7 +635,7 @@ $('#startBtn').onclick = async () => {
   if (far.length && !confirm(`${far.map(([, p]) => p.name).join(', ')} 님이 시작 지점 ${cfg.startR}m 밖이에요. 그래도 시작할까요?`)) return;
   const t = now();
   const upd = { status: 'playing', winner: null, visited: null, 'config/real': shuffle(cands).slice(0, cfg.winCount), startedAt: t, huntStartAt: t + cfg.headStartSec * 1000, endAt: t + cfg.durationMin * 60000 };
-  ps.forEach(([id]) => Object.assign(upd, { [`players/${id}/caught`]: false, [`players/${id}/caughtAt`]: null, [`players/${id}/rescues`]: 0, [`players/${id}/out`]: false, [`players/${id}/eliminated`]: false }));
+  ps.forEach(([id]) => Object.assign(upd, { [`players/${id}/caught`]: false, [`players/${id}/caughtAt`]: null, [`players/${id}/rescues`]: 0, [`players/${id}/out`]: false, [`players/${id}/eliminated`]: false, [`players/${id}/immuneUntil`]: null, [`players/${id}/catchCode`]: newCode(), [`players/${id}/rescueCode`]: null }));
   tool = null;
   await update(rRef(), upd);
 };
@@ -634,11 +650,55 @@ async function keepAwake() { try { if ('wakeLock' in navigator && (!wakeLock || 
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && room && room.status === 'playing') keepAwake(); });
 document.addEventListener('click', () => { if (room && room.status === 'playing') keepAwake(); });
 
-$('#caughtBtn').onclick = () => { if (confirm('헌터에게 터치당했나요?')) update(meRef(), { caught: true, caughtAt: now() }); };
-$('#rescueBtn').onclick = () => {
-  const m = me(); if (!m) return;
-  if ((m.rescues || 0) >= 1) return alert('구출은 1인당 한 번만 받을 수 있어요');
-  if (confirm('동료가 25m 안에서 15초 머문 뒤 터치했나요?')) update(meRef(), { caught: false, caughtAt: null, rescues: 1, immuneUntil: now() + 30000 });
+// ====== 잡기·구출 코드 ======
+// 코드는 "목숨 하나당 하나": 게임 시작/구출 때 새로 발급되고, 쓰이면 바로 폐기.
+// 입력하는 사람이 대상 근처(40m, GPS 오차 감안)에 있어야 통과.
+const CODE_R = 40;
+const newCode = () => String(Math.floor(1000 + Math.random() * 9000));
+let codeAction = null;
+function askCode(title, sub, fn) {
+  codeAction = fn; $('#codeTitle').textContent = title; $('#codeSub').textContent = sub;
+  $('#codeEntry').value = ''; show('#codeBox', true); setTimeout(() => $('#codeEntry').focus(), 50);
+}
+$('#codeCancel').onclick = () => { show('#codeBox', false); codeAction = null; };
+$('#codeOk').onclick = async () => {
+  const c = $('#codeEntry').value.trim();
+  if (!/^\d{4}$/.test(c)) return toast('4자리 숫자를 입력하세요');
+  const fn = codeAction; show('#codeBox', false); codeAction = null;
+  if (fn) await fn(c);
+};
+$('#codeEntry').addEventListener('keydown', e => { if (e.key === 'Enter') $('#codeOk').click(); });
+const near = p => !myPos || p.lat == null || dist(myPos, p) <= CODE_R;
+
+$('#catchBtn').onclick = () => {
+  if (now() < room.huntStartAt) return toast('아직 추격 시작 전이에요');
+  askCode('🔒 잡기', '터치한 러너의 "내 코드" 4자리', async c => {
+    const hit = players().find(([, p]) => p.role === 'runner' && !p.caught && p.catchCode === c);
+    if (!hit) return toast('❌ 코드가 틀렸어요');
+    const [id, p] = hit;
+    if (p.immuneUntil && now() < p.immuneUntil) return toast(`🛡 ${p.name} 무적 중!`);
+    if (!near(p)) return toast('❌ 너무 멀어요. 직접 가서 잡으세요');
+    await update(rRef(`players/${id}`), { caught: true, caughtAt: now(), caughtBy: myId, catchCode: null, rescueCode: newCode() });
+    toast(`⛓ ${p.name} 잡았다!`);
+  });
+};
+$('#rescueGoBtn').onclick = () => {
+  askCode('🤝 구출', '감옥에 있는 동료 화면의 구출 코드', async c => {
+    const hit = players().find(([id, p]) => id !== myId && p.role === 'runner' && p.caught && !p.eliminated && p.rescueCode === c);
+    if (!hit) return toast('❌ 코드가 틀렸어요');
+    const [id, p] = hit;
+    if ((p.rescues || 0) >= 1) return toast('이미 한 번 구출된 동료예요');
+    if (!near(p)) return toast('❌ 너무 멀어요. 직접 가서 터치하세요');
+    const until = now() + 30000;
+    await update(rRef(), { [`players/${id}/caught`]: false, [`players/${id}/caughtAt`]: null, [`players/${id}/rescues`]: 1, [`players/${id}/immuneUntil`]: until, [`players/${id}/rescueCode`]: null, [`players/${id}/catchCode`]: newCode(), [`players/${myId}/immuneUntil`]: until });
+    toast(`🤝 ${p.name} 구출 성공! 둘 다 30초 무적`);
+  });
+};
+let codeHideT;
+$('#showCodeBtn').onclick = () => {
+  const m = me(); if (!m || !m.catchCode) return;
+  $('#showCodeBtn').innerHTML = `<span class="myCode" style="font-size:22px;letter-spacing:4px">${m.catchCode}</span>`;
+  clearTimeout(codeHideT); codeHideT = setTimeout(() => $('#showCodeBtn').textContent = '👁 내 코드', 10000);
 };
 $('#soundBtn').onclick = () => {
   try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); audioCtx.resume(); } catch (e) {}
@@ -659,7 +719,7 @@ function updateCompass() {
   const arrow = $('#arrow');
   if (compassBearing == null) { arrow.style.transform = ''; arrow.textContent = '·'; }
   else if (aimNear) { arrow.style.transform = ''; arrow.textContent = '‼'; }
-  else { arrow.textContent = '⬆'; arrow.style.transform = `rotate(${compassBearing}deg)`; }
+  else { arrow.textContent = '⬆'; arrow.style.transform = `rotate(${compassBearing - map.getBearing()}deg)`; }
   const show = role0() === 'hunter' && compassBearing != null && myPos;
   if (!show) { if (aimMarker) { aimMarker.remove(); aimMarker = null; } return; }
   if (!aimMarker) {
@@ -755,7 +815,7 @@ function tick() {
       aimNear = bd < 25; // 25m 안에선 GPS 오차가 커서 방향 대신 경고
       compassBearing = smoothBearing(brg(myPos, best));
     } else { compassBearing = null; aimX = aimY = 0; }
-    $('#compassLbl').textContent = compassBearing == null ? '추적 대상 없음' : aimNear ? '아주 가까이 있음! 눈으로 찾으세요' : '가장 가까운 러너 방향 (지도 기준, 위 = 북쪽)';
+    $('#compassLbl').textContent = compassBearing == null ? '추적 대상 없음' : aimNear ? '아주 가까이 있음! 눈으로 찾으세요' : '가장 가까운 러너 방향';
     updateCompass();
   }
 
@@ -785,7 +845,7 @@ function render() {
   }
 
   show('#lobby', st === 'lobby');
-  show('#gamePanel', st === 'playing');
+  show('#gamePanel', st === 'playing' && !(m.role === 'runner' && m.caught));
   show('#result', st === 'ended');
   show('#hud', st !== 'lobby' || true);
   if (myPos) setM('me', myPos, 'me', '나', seen);
@@ -833,10 +893,13 @@ function render() {
     show('#jail', jailed);
     if (jailed) {
       $('#jailTimer').textContent = m.eliminated ? '탈락' : fmt(m.caughtAt + cfg.jailSec * 1000 - t);
-      show('#rescueBtn', !m.eliminated && (m.rescues || 0) < 1);
-      $('#jailInfo').textContent = m.eliminated ? '관전 중 (자기 팀만 보여요)' : (m.rescues ? '이미 한 번 구출받았어요' : '동료가 와서 터치하면 아래 버튼을 누르세요');
+      const canRescue = !m.eliminated && (m.rescues || 0) < 1;
+      $('#jailCode').textContent = canRescue ? (m.rescueCode || '') : '';
+      $('#jailInfo').textContent = m.eliminated ? '관전 중 (자기 팀만 보여요)' : (canRescue ? '구출 코드 — 동료가 와서 터치하면 이 코드를 보여주세요' : '이미 한 번 구출받아서 더 이상 구출될 수 없어요');
     }
-    if (m.immuneUntil && t < m.immuneUntil) banner(`🛡 무적 ${Math.ceil((m.immuneUntil - t) / 1000)}초`);
+    show('#runnerActs', role === 'runner' && !m.caught);
+    if (m.immuneUntil && t < m.immuneUntil) { banner(`🛡 무적 ${Math.ceil((m.immuneUntil - t) / 1000)}초`); immuneShown = true; }
+    else if (immuneShown) { immuneShown = false; banner(''); }
 
     if (role === 'runner') {
       (cfg.real || []).forEach((id, i) => { if (cands[id]) setM('c_' + id, cands[id], visited[id] ? 'done' : 'cp', visited[id] ? '확보' : '', seen, visited[id] ? '✓' : String(i + 1)); });
@@ -866,7 +929,7 @@ function render() {
   show('#chatBtn', inGame);
   show('#tauntBtn', inGame && role === 'runner' && !m.eliminated && t >= room.huntStartAt);
   if (!inGame) { show('#chat', false); show('#tauntView', false); chatOpen = false; }
-  const gp = $('#gamePanel'); document.documentElement.style.setProperty('--sheetH', (inGame ? gp.offsetHeight : 0) + 'px');
+  const gp = $('#gamePanel'); document.documentElement.style.setProperty('--sheetH', (inGame ? Math.max(gp.offsetHeight, $('#jail').offsetHeight + 14) : 0) + 'px');
   if (st === 'ended') {
     show('#jail', false); show('#blackout', false); setBeat(0); banner('');
     const runners = ps.filter(([, p]) => p.role === 'runner');
