@@ -25,12 +25,31 @@ button.on{outline:2px solid var(--acc)}
 #home{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;flex-direction:column;gap:12px;padding:22px 20px calc(20px + env(safe-area-inset-bottom));background:linear-gradient(to top,#0d0f14 70%,rgba(13,15,20,.85));border-radius:20px 20px 0 0}
 #home h1{font-size:40px;letter-spacing:6px;margin:0;font-weight:900}
 #home .sub{margin:0 0 6px;color:var(--mut)}
-#help{position:fixed;inset:0;z-index:40;background:rgba(5,6,9,.97);overflow:auto;padding:calc(20px + env(safe-area-inset-top)) 20px calc(30px + env(safe-area-inset-bottom))}
-#help h2{margin:0 0 4px;font-size:28px}
-#help h3{margin:22px 0 6px;font-size:17px;color:var(--acc)}
-#help p,#help li{color:#d6dbe4;font-size:15px;line-height:1.6}
-#help ul{margin:0;padding-left:20px}
-#help .close{position:sticky;top:0;float:right}
+#help{position:fixed;inset:0;z-index:40;background:#07080b;display:flex;flex-direction:column;padding:calc(14px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom))}
+#help .top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+#help .top h2{margin:0;font-size:22px;letter-spacing:2px}
+#helpHome{flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px;max-width:520px;width:100%;margin:0 auto}
+#helpHome .lead{color:var(--mut);text-align:center;margin:0 0 8px;line-height:1.6}
+.hcard{display:flex;align-items:center;gap:16px;padding:20px;border-radius:18px;border:1px solid var(--line);background:#11141b;text-align:left;width:100%;animation:fadeUp .5s both}
+.hcard:nth-child(3){animation-delay:.08s}.hcard:nth-child(4){animation-delay:.16s}
+.hcard .ic{font-size:34px;width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.hcard b{display:block;font-size:19px;margin-bottom:3px}
+.hcard span{color:var(--mut);font-size:13px;font-weight:500}
+.hcard.g .ic{background:#2a2410}.hcard.r .ic{background:#0e2a20}.hcard.h .ic{background:#2c1012}
+#helpDeck{flex:1;display:flex;flex-direction:column;max-width:560px;width:100%;margin:0 auto;min-height:0}
+#tStage{position:relative;width:100%;aspect-ratio:5/3;border-radius:18px;background:radial-gradient(circle at 50% 40%,#1a1f2a,#0c0e13);border:1px solid var(--line);overflow:hidden;flex:0 0 auto}
+#tStage svg{width:100%;height:100%;display:block}
+#tStep{color:var(--mut);font-size:12px;font-weight:800;letter-spacing:2px;margin:16px 0 4px}
+#tTitle{font-size:24px;font-weight:900;margin:0 0 8px}
+#tDesc{color:#d6dbe4;font-size:15.5px;line-height:1.65;margin:0;overflow:auto}
+#tDesc b{color:#fff}
+.fadeUp{animation:fadeUp .45s both}.fadeUp2{animation:fadeUp .45s .12s both}.fadeUp3{animation:fadeUp .45s .22s both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+#tDots{display:flex;gap:6px;justify-content:center;margin:14px 0 10px}
+#tDots i{width:7px;height:7px;border-radius:4px;background:#333a47;transition:all .25s}
+#tDots i.on{width:22px;background:var(--acc)}
+#tNav{display:flex;gap:10px;margin-top:auto}
+#tNav button{flex:1}
 /* sheet */
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--panel);border-radius:18px 18px 0 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom));max-height:58vh;overflow:auto;display:flex;flex-direction:column;gap:10px}
 .code{font-size:22px;font-weight:900;letter-spacing:3px}
@@ -65,6 +84,17 @@ button.on{outline:2px solid var(--acc)}
 #tauntView img{max-width:100%;max-height:62vh;border-radius:14px;border:3px solid var(--run);transform:rotate(-2deg)}
 #tauntView .t{font-size:22px;font-weight:900;color:var(--run)}
 .gps{font-size:12px}
+.steps{display:flex;gap:6px}
+.steps button{flex:1;padding:9px 4px;font-size:13px;white-space:nowrap}
+.steps button.done{color:var(--run);border-color:#1f5a44}
+.steps button.on{background:var(--acc);color:#1a1300;border-color:var(--acc);outline:none}
+.steps button:disabled{opacity:.35}
+.sl{display:flex;align-items:center;gap:10px;margin:6px 0}
+.sl span{width:78px;font-size:13px;color:var(--mut);font-weight:700}
+.sl input{flex:1;accent-color:var(--acc);height:28px}
+.sl b{width:36px;text-align:right;font-size:18px}
+.cpBar{height:8px;border-radius:4px;background:#222833;overflow:hidden;margin-top:4px}
+.cpBar>div{height:100%;background:var(--acc);transition:width .25s}
 #codeBox{position:fixed;inset:0;z-index:45;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;padding:24px}
 #codeBox .in{background:#161a22;border-radius:18px;padding:20px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px;text-align:center}
 #codeBox input{font-size:34px;letter-spacing:12px;text-align:center;font-weight:900}
@@ -136,25 +166,21 @@ button.on{outline:2px solid var(--acc)}
 
 <!-- HELP -->
 <div id="help" class="hide">
-  <button class="sm close" id="helpClose">닫기 ✕</button>
-  <h2>MANHUNT</h2>
-  <p>실제 동네에서 하는 GPS 술래잡기. 러너는 미션을 깨며 도망치고, 헌터는 폰으로 추적해서 잡아요.</p>
-  <h3>🏃 러너 승리</h3>
-  <p>지도의 <b>진짜 체크포인트</b>(초록 육각형 신호기)를 <b>1번부터 순서대로</b> 모두 켜면 승리. 지금 켤 차례인 신호기만 반짝이고, 20m 안에서 30초 머물면 확보돼요. 순서는 러너팀 공용이에요.</p>
-  <h3>🔪 헌터 승리</h3>
-  <p>러너를 <b>모두 잡거나</b>, 제한 시간 안에 러너가 체크포인트를 다 못 모으면 승리.</p>
-  <h3>⏱ 진행</h3>
-  <ul><li>시작 지점에 모두 모여서 시작</li><li>러너 먼저 출발, 헌터는 2분간 화면이 꺼진 채 대기</li><li>그다음 추격 시작</li></ul>
-  <h3>🧭 헌터가 아는 것</h3>
-  <ul><li>나침반: 지도 위 내 위치 둘레의 빨간 화살표가 가장 가까운 러너 방향을 가리켜요 (지도를 돌려도 맞게 따라가요. 오른쪽 위 나침반 버튼을 누르면 북쪽이 위로)</li><li>위치 핑: 90초마다 러너의 정확한 위치</li><li>체크포인트 후보(노란 ? 신호기) — 어느 게 진짜인지는 모름</li></ul>
-  <h3>💓 러너가 아는 것</h3>
-  <ul><li>진짜 체크포인트 위치</li><li>심장소리: 헌터가 50m 안에 오면 화면이 붉게 뛰고, 가까울수록 빨라져요 (소리는 이어폰 켰을 때만)</li></ul>
-  <h3>⛓ 잡기와 구출</h3>
-  <ul><li>헌터가 러너를 <b>실제로 터치</b>하면, 러너는 "👁 내 코드" 4자리를 보여줘요 → 헌터가 🔒 잡기에 입력하면 잡힘</li><li>잡힌 러너는 그 자리에서 대기</li><li>동료 러너가 와서 터치하면 "🔑 구출 코드 보기" → 동료가 🤝 구출에 입력하면 부활 (1인 1회, 5분 넘으면 탈락)</li><li>코드는 <b>보기를 누를 때마다 새로 발급</b>되고 30초만 유효해요. 미리 봐두고 채팅으로 보내는 꼼수는 안 통해요. 입력하는 사람도 근처(약 40m)에 있어야 해요</li><li>구출 직후 두 사람 모두 30초 무적</li></ul>
-  <h3>🚧 규칙</h3>
-  <ul><li>빨간 선 구역 밖으로 나가면 내 위치가 상대에게 실시간 공개</li><li>건물 안(로비·엘리베이터·주차장) 진입 금지</li><li>차도는 횡단보도로만</li><li>💬 팀 채팅: 같은 팀에게만 보여요 (전화·카톡도 자유)</li><li>📸 도발: 러너는 사진을 찍어 헌터 전원에게 보낼 수 있어요 (1분에 1번). 단, 배경으로 위치가 들킬 수 있어요!</li><li>📶 GPS 표시가 "약함"이면 위치가 수십 m 튈 수 있어요. 고층 빌딩 사이보다 트인 곳에서 정확해요</li><li>게임 중엔 화면을 켜두세요</li></ul>
-  <h3>👑 방장 준비</h3>
-  <ul><li>⬡ 구역 설정: 지도를 탭해 꼭짓점을 차례로 찍기 (↩︎로 하나씩 취소)</li><li>체크포인트 후보: 지도를 탭해 추가 (다시 탭하면 삭제)</li><li>시작 지점: 지도를 탭해 지정</li><li>참가자를 탭하면 러너/헌터 전환, 🎲로 랜덤 배정</li></ul>
+  <div class="top"><button class="sm" id="helpBack">←</button><h2 id="helpHead">게임 방법</h2><button class="sm" id="helpClose">닫기 ✕</button></div>
+  <div id="helpHome">
+    <p class="lead">실제 동네에서 하는 GPS 술래잡기.<br>궁금한 걸 골라보세요.</p>
+    <button class="hcard g" data-deck="game"><div class="ic">🗺</div><div><b>게임 진행</b><span>팀, 구역, 시작, 승패</span></div></button>
+    <button class="hcard r" data-deck="runner"><div class="ic">🏃</div><div><b>러너</b><span>신호기를 켜고 살아남기</span></div></button>
+    <button class="hcard h" data-deck="hunter"><div class="ic">🔪</div><div><b>헌터</b><span>추적하고 잡기</span></div></button>
+  </div>
+  <div id="helpDeck" class="hide">
+    <div id="tStage"></div>
+    <div id="tStep"></div>
+    <h3 id="tTitle"></h3>
+    <p id="tDesc"></p>
+    <div id="tDots"></div>
+    <div id="tNav"><button id="tPrev">이전</button><button id="tNext" class="go">다음</button></div>
+  </div>
 </div>
 
 <!-- HUD -->
@@ -172,13 +198,20 @@ button.on{outline:2px solid var(--acc)}
     <button class="sm" id="leaveBtn" style="flex:0">나가기</button>
   </div>
   <div id="hostTools" class="hide">
-    <div class="row">
-      <button class="sm" data-tool="cp">체크포인트 후보</button>
-      <button class="sm" data-tool="start">시작 지점</button>
-      <button class="sm" data-tool="zone">⬡ 구역 설정</button>
+    <div class="steps">
+      <button class="sm" data-step="zone">① 구역</button>
+      <button class="sm" data-step="start">② 시작 지점</button>
+      <button class="sm" data-step="cp">③ 체크포인트</button>
     </div>
-    <div class="row" id="zoneActs" style="margin-top:8px"><button class="sm go" id="zoneDone">구역 저장</button><button class="sm" id="zoneUndo">↩︎ 되돌리기</button><button class="sm" id="zoneCancel">취소</button></div>
     <p class="mut" id="toolHint" style="margin:8px 0 0"></p>
+    <div id="zoneActs" class="row" style="margin-top:8px"><button class="sm" id="zoneUndo">↩︎ 되돌리기</button><button class="sm go" id="zoneDone">구역 저장 →</button></div>
+    <div id="startActs" class="row" style="margin-top:8px"><button class="sm go" id="startNext">다음 →</button></div>
+    <div id="cpActs" style="margin-top:8px">
+      <div class="sl"><span>총 후보</span><input type="range" id="candTotal" min="3" max="12" step="1"><b id="candTotalLbl"></b></div>
+      <div class="sl"><span>진짜 신호기</span><input type="range" id="realCnt" min="1" max="12" step="1"><b id="realCntLbl"></b></div>
+      <div class="cpBar"><div id="cpFill"></div></div>
+      <div class="row" style="margin-top:8px"><button class="sm" id="cpUndo">↩︎ 마지막 핀 지우기</button><button class="sm go" id="cpDone">설정 완료 ✓</button></div>
+    </div>
   </div>
   <div class="mut" id="cfgLbl"></div>
   <div id="plist" style="display:flex;flex-direction:column;gap:6px"></div>
@@ -272,7 +305,8 @@ const DEF = {
   pingSec: 90,        // 위치 핑 간격
   checkinSec: 30,     // 체크인 머무는 시간
   checkinR: 20,       // 체크인 반경 (m)
-  winCount: 4,        // 러너 승리에 필요한 체크포인트 수 (진짜 체크포인트 수)
+  winCount: 4,        // 진짜 신호기 수 (러너 승리 조건)
+  candTotal: 8,       // 체크포인트 후보 총 개수
   jailSec: 300,       // 감옥 제한 시간
   zoneBuffer: 15,     // 구역 경계 오차 허용 (m)
   outGraceSec: 10,    // 구역 이탈 유예
@@ -583,17 +617,40 @@ $('#shareBtn').onclick = async () => {
   try { if (navigator.share) await navigator.share({ title: 'MANHUNT', text: '방 코드 ' + roomCode, url }); else { await navigator.clipboard.writeText(url); toast('링크 복사됨'); } } catch (e) {}
 };
 $('#leaveBtn').onclick = async () => { if (!confirm('방에서 나갈까요?')) return; await remove(meRef()); location.href = location.pathname; };
-document.querySelectorAll('[data-tool]').forEach(b => b.onclick = () => {
-  const t = b.dataset.tool;
-  tool = tool === t ? null : t;
-  zoneDraft = [];
-  renderDraft(); render();
-});
+// ====== 게임 설정: ① 구역 → ② 시작 지점 → ③ 체크포인트 ======
+let autoStepped = false;
+function setStep(st) { tool = st; zoneDraft = []; renderDraft(); render(); }
+function firstUndone(cfg) {
+  if (!cfg.zone || cfg.zone.length < 3) return 'zone';
+  if (!cfg.start) return 'start';
+  if (Object.keys(cfg.candidates || {}).length < (cfg.candTotal || 8)) return 'cp';
+  return null;
+}
+document.querySelectorAll('[data-step]').forEach(b => b.onclick = () => setStep(tool === b.dataset.step ? null : b.dataset.step));
 $('#zoneDone').onclick = async () => {
   if (zoneDraft.length < 3) return alert('꼭짓점을 3개 이상 찍어주세요');
-  await update(rRef('config'), { zone: zoneDraft }); tool = null; zoneDraft = []; renderDraft(); render();
+  const z = zoneDraft;
+  await update(rRef('config'), { zone: z }); setStep(room.config.start ? null : 'start');
+  if (!room.config.start) toast('② 시작 지점을 찍어주세요');
 };
-$('#zoneCancel').onclick = () => { tool = null; zoneDraft = []; renderDraft(); render(); };
+$('#startNext').onclick = () => setStep('cp');
+const cpCount = () => Object.keys((room.config || {}).candidates || {}).length;
+$('#candTotal').oninput = e => { $('#candTotalLbl').textContent = e.target.value; };
+$('#candTotal').onchange = async e => {
+  const total = +e.target.value, cfg = room.config, upd = { candTotal: total };
+  if ((cfg.winCount || 4) > total) upd.winCount = total;
+  const ids = Object.keys(cfg.candidates || {}).sort();
+  ids.slice(total).forEach(id => upd['candidates/' + id] = null); // 줄이면 최근 핀부터 삭제
+  await update(rRef('config'), upd);
+};
+$('#realCnt').oninput = e => { $('#realCntLbl').textContent = e.target.value; };
+$('#realCnt').onchange = e => update(rRef('config'), { winCount: +e.target.value });
+$('#cpUndo').onclick = () => { const ids = Object.keys(room.config.candidates || {}).sort(); if (ids.length) remove(rRef('config/candidates/' + ids[ids.length - 1])); };
+$('#cpDone').onclick = () => {
+  const total = room.config.candTotal || 8;
+  if (cpCount() < total) return toast(`핀을 ${total - cpCount()}개 더 찍어주세요`);
+  setStep(null); toast('설정 완료! 역할을 정하고 시작하세요');
+};
 function renderDraft() {
   if (!mapReady) return;
   let d = fc();
@@ -608,10 +665,15 @@ map.on('click', e => {
   const p = { lng: e.lngLat.lng, lat: e.lngLat.lat };
   if (tool === 'cp') {
     const near = Object.entries(room.config.candidates || {}).find(([, v]) => dist(v, p) < 20);
-    if (near) remove(rRef('config/candidates/' + near[0]));
-    else set(rRef('config/candidates/c' + Date.now().toString(36)), p);
+    if (near) return remove(rRef('config/candidates/' + near[0]));
+    const total = room.config.candTotal || 8;
+    if (cpCount() >= total) return toast(`핀 ${total}개를 다 찍었어요 (근처를 탭하면 삭제)`);
+    if (room.config.zone && !inPoly(p, room.config.zone)) return toast('구역 안에만 찍을 수 있어요');
+    set(rRef('config/candidates/c' + Date.now().toString(36)), p);
+    if (cpCount() + 1 >= total) toast('✓ 핀을 다 찍었어요');
   } else if (tool === 'start') {
-    update(rRef('config'), { start: p }); tool = null; render();
+    if (room.config.zone && !inPoly(p, room.config.zone)) return toast('시작 지점은 구역 안에 찍어주세요');
+    update(rRef('config'), { start: p });
   } else if (tool === 'zone') {
     zoneDraft.push([p.lng, p.lat]); renderDraft(); render();
   }
@@ -632,9 +694,9 @@ $('#startBtn').onclick = async () => {
   const runners = ps.filter(([, p]) => p.role === 'runner'), hunters = ps.filter(([, p]) => p.role === 'hunter');
   if (!runners.length || !hunters.length) return alert('러너와 헌터가 최소 1명씩 필요해요');
   const cands = Object.keys(cfg.candidates || {});
-  if (cands.length < cfg.winCount) return alert(`체크포인트 후보를 ${cfg.winCount}곳 이상 찍어주세요 (지금 ${cands.length}곳)`);
-  if (!cfg.zone || cfg.zone.length < 3) return alert('⬡ 구역 설정으로 경계를 먼저 찍어주세요');
-  if (!cfg.start) return alert('시작 지점을 찍어주세요');
+  if (!cfg.zone || cfg.zone.length < 3) { setStep('zone'); return alert('① 구역을 먼저 설정해주세요'); }
+  if (!cfg.start) { setStep('start'); return alert('② 시작 지점을 찍어주세요'); }
+  if (cands.length < (cfg.candTotal || 8) || cands.length < cfg.winCount) { setStep('cp'); return alert(`③ 체크포인트 핀을 ${cfg.candTotal || 8}개 찍어주세요 (지금 ${cands.length}개)`); }
   const far = ps.filter(([, p]) => !(p.lat != null && dist(p, cfg.start) <= cfg.startR));
   if (far.length && !confirm(`${far.map(([, p]) => p.name).join(', ')} 님이 시작 지점 ${cfg.startR}m 밖이에요. 그래도 시작할까요?`)) return;
   const t = now();
@@ -880,12 +942,31 @@ function render() {
   if (st === 'lobby') {
     $('#codeLbl').textContent = roomCode;
     const host = isHost();
-    show('#hostTools', host); show('#hostBtns', host); show('#waitLbl', !host);
-    document.querySelectorAll('[data-tool]').forEach(b => b.classList.toggle('on', b.dataset.tool === tool));
-    show('#zoneActs', tool === 'zone');
-    $('#toolHint').textContent = tool === 'cp' ? '지도를 탭해 후보 추가 · 기존 후보 근처를 탭하면 삭제' : tool === 'start' ? '지도에서 시작 지점을 탭하세요' : tool === 'zone' ? `경계를 따라 지도를 탭해 꼭짓점을 찍으세요 · ${zoneDraft.length}개${zoneDraft.length >= 3 ? ' → [구역 저장]' : ''}` : '참가자를 탭하면 러너/헌터가 바뀌어요';
+    if (host && !autoStepped) { autoStepped = true; tool = firstUndone(cfg); }
+    show('#hostTools', host); show('#hostBtns', host && !tool); show('#plist', !(host && tool)); show('#cfgLbl', !(host && tool)); show('#waitLbl', !host);
+    const nC0 = Object.keys(cfg.candidates || {}).length, total = cfg.candTotal || 8, real = Math.min(cfg.winCount || 4, total);
+    const hasZone = cfg.zone && cfg.zone.length >= 3;
+    const doneMap = { zone: hasZone, start: !!cfg.start, cp: nC0 >= total };
+    document.querySelectorAll('[data-step]').forEach(b => {
+      const k = b.dataset.step;
+      b.classList.toggle('on', k === tool); b.classList.toggle('done', doneMap[k] && k !== tool);
+      b.disabled = (k === 'start' && !hasZone) || (k === 'cp' && (!hasZone || !cfg.start));
+      b.textContent = { zone: '① 구역', start: '② 시작 지점', cp: '③ 체크포인트' }[k] + (doneMap[k] ? ' ✓' : '');
+    });
+    show('#zoneActs', tool === 'zone'); show('#startActs', tool === 'start' && !!cfg.start); show('#cpActs', tool === 'cp');
+    if (tool === 'cp') {
+      const ct = $('#candTotal'), rc = $('#realCnt');
+      if (document.activeElement !== ct) { ct.value = total; $('#candTotalLbl').textContent = total; }
+      rc.max = total;
+      if (document.activeElement !== rc) { rc.value = real; $('#realCntLbl').textContent = real; }
+      $('#cpFill').style.width = Math.min(100, nC0 / total * 100) + '%';
+    }
+    $('#toolHint').innerHTML = tool === 'zone' ? `<b>① 구역</b> — 경계를 따라 지도를 탭해 꼭짓점을 찍으세요 · ${zoneDraft.length}개${zoneDraft.length >= 3 ? ' → 구역 저장' : ''}`
+      : tool === 'start' ? `<b>② 시작 지점</b> — ${cfg.start ? '다시 탭하면 옮겨져요' : '구역 안에서 모두 모일 곳을 탭하세요'}`
+      : tool === 'cp' ? `<b>③ 체크포인트</b> — 후보 ${total}개 중 <b>${real}개</b>가 진짜 신호기가 돼요. 지도를 탭해 핀을 찍으세요 <b>${nC0}/${total}</b>`
+      : (firstUndone(cfg) ? '설정이 남았어요. 위 단계를 눌러 마무리하세요' : '✓ 설정 완료 · 참가자를 탭하면 러너/헌터가 바뀌어요');
     const nC = Object.keys(cfg.candidates || {}).length;
-    $('#cfgLbl').textContent = `${cfg.zone ? '' : '구역 미지정 · '}체크포인트 후보 ${nC}곳 중 진짜 ${cfg.winCount}곳 · 핑 ${cfg.pingSec}초 · ${cfg.durationMin}분${cfg.start ? '' : ' · 시작 지점 미지정'}`;
+    $('#cfgLbl').textContent = `신호기 후보 ${nC}/${cfg.candTotal || 8}곳 중 진짜 ${cfg.winCount}곳 · 핑 ${cfg.pingSec}초 · ${cfg.durationMin}분`;
     $('#plist').innerHTML = ps.map(([id, p]) => {
       const d = cfg.start && p.lat != null ? dist(p, cfg.start) : null;
       return `<div class="pl" data-id="${id}"><span class="chip ${p.role}">${p.role === 'runner' ? '러너' : '헌터'}</span><span class="pn">${esc(p.name)}${id === room.host ? ' 👑' : ''}${id === myId ? ' (나)' : ''}</span><span class="pd">${d == null ? '—' : Math.round(d) + 'm'} ${d != null && d <= cfg.startR ? '✅' : ''}</span></div>`;
@@ -959,7 +1040,141 @@ function render() {
 function cleanup(seen) {
   Object.keys(markers).forEach(k => { if (!seen.has(k)) { markers[k].remove(); delete markers[k]; } });
 }
-document.querySelectorAll('.helpBtn').forEach(b => b.onclick = () => show('#help', true));
+// ====== 게임 방법 (애니메이션 튜토리얼) ======
+const C = { run: '#2ee59d', hunt: '#ff4d4d', acc: '#ffd23f', gray: '#5b6270', dim: '#2b313c', blue: '#3d8bff' };
+const svgWrap = inner => `<svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'Apple SD Gothic Neo',sans-serif">${inner}</svg>`;
+const dot = (x, y, c, r = 7, extra = '') => `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}" stroke="#fff" stroke-width="2">${extra}</circle>`;
+const hexPts = (x, y, r) => [0, 1, 2, 3, 4, 5].map(i => { const a = Math.PI / 3 * i - Math.PI / 2; return `${(x + r * Math.cos(a)).toFixed(1)},${(y + r * Math.sin(a)).toFixed(1)}`; }).join(' ');
+const hex = (x, y, fill, label, extra = '', r = 13) => `<g><polygon points="${hexPts(x, y, r)}" fill="${fill}">${extra}</polygon><text x="${x}" y="${y + 5}" text-anchor="middle" font-size="13" font-weight="900" fill="#0b0d12">${label}</text></g>`;
+const txt = (x, y, t, c = '#fff', size = 12, extra = '', anchor = 'middle') => `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="${size}" font-weight="800" fill="${c}">${t}${extra}</text>`;
+const fade = (dur, kt, vals) => `<animate attributeName="opacity" dur="${dur}s" repeatCount="indefinite" keyTimes="${kt}" values="${vals}"/>`;
+const appear = (dur, at) => fade(dur, `0;${at};${Math.min(at + 0.04, 0.99)};1`, '0;0;1;1');
+const fillAt = (dur, at, from, to) => `<animate attributeName="fill" dur="${dur}s" repeatCount="indefinite" keyTimes="0;${at};${Math.min(at + 0.01, 0.99)};1" values="${from};${from};${to};${to}"/>`;
+const move = (dur, path, kt = '0;1', kp = '0;1') => `<animateMotion dur="${dur}s" repeatCount="indefinite" path="${path}" keyTimes="${kt}" keyPoints="${kp}" calcMode="linear"/>`;
+const mover = (c, dur, path, kt, kp, r = 7, extra = '') => `<circle r="${r}" fill="${c}" stroke="#fff" stroke-width="2">${move(dur, path, kt, kp)}${extra}</circle>`;
+const ripple = (x, y, c, dur, begin = 0) => `<circle cx="${x}" cy="${y}" r="8" fill="none" stroke="${c}" stroke-width="2"><animate attributeName="r" values="8;34" dur="${dur}s" begin="${begin}s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="${dur}s" begin="${begin}s" repeatCount="indefinite"/></circle>`;
+const zonePoly = '40,30 250,22 275,110 210,160 60,150 25,90';
+const phone = (x, y, w, h, inner) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="#0b0d12" stroke="#3a4150" stroke-width="2"/>${inner}`;
+
+const DECKS = {
+  game: { name: '게임 진행', slides: [
+    { t: '두 팀으로 나눠요', d: '<b>러너</b>는 도망치며 미션을 하고, <b>헌터</b>는 추적해서 잡아요. 6명이면 러너 2 : 헌터 4. 방장이 직접 정하거나 🎲로 랜덤 배정해요.',
+      s: () => [[95, 70], [95, 110]].map(([x, y], i) => dot(x, y, C.run, 11, `<animate attributeName="r" values="0;13;11" dur=".5s" begin="${i * .15}s" fill="freeze"/>`)).join('') + txt(95, 150, '러너', C.run, 14)
+        + [[205, 60], [235, 80], [205, 105], [235, 125]].map(([x, y], i) => dot(x, y, C.hunt, 11, `<animate attributeName="r" values="0;13;11" dur=".5s" begin="${.4 + i * .12}s" fill="freeze"/>`)).join('') + txt(220, 155, '헌터', C.hunt, 14)
+        + txt(150, 98, 'VS', '#fff', 22, `<animate attributeName="opacity" values="0;1" dur=".4s" begin="1s" fill="freeze"/>`).replace('<text', '<text opacity="0"') },
+    { t: '빨간 구역 안에서만', d: '방장이 지도를 탭해서 <b>꼭짓점을 찍어</b> 경기 구역을 정해요. 구역 밖으로 나가면 10초 뒤 <b>내 위치가 상대 팀에 실시간 공개</b>돼요.',
+      s: () => `<polygon points="${zonePoly}" fill="${C.hunt}" fill-opacity=".08" stroke="${C.hunt}" stroke-width="2.5" stroke-dasharray="6 4"/>`
+        + `<circle r="8" stroke="#fff" stroke-width="2">${move(5, 'M150 95 L290 160', '0;.2;.6;1', '0;0;1;1')}<animate attributeName="fill" dur="5s" repeatCount="indefinite" keyTimes="0;.6;.62;1" values="${C.run};${C.run};#ff9f1c;#ff9f1c"/></circle>`
+        + `<g opacity="0">${appear(5, .66)}<rect x="196" y="120" width="96" height="22" rx="11" fill="#ff9f1c"/>${txt(244, 135, '📍 위치 공개!', '#1a1000', 11)}</g>` },
+    { t: '모여서 시작', d: '방장이 찍은 <b>시작 지점</b>에 모두 모이면 시작. 러너가 먼저 흩어지고, 헌터는 <b>2분 동안 화면이 꺼진 채</b> 대기해요.',
+      s: () => `<circle cx="110" cy="90" r="14" fill="#b06bff" opacity=".35"/>` + txt(110, 120, '시작', '#b06bff', 11)
+        + mover(C.run, 4, 'M110 90 L30 35', '0;.15;.7;1', '0;0;1;1') + mover(C.run, 4, 'M110 90 L40 160', '0;.15;.7;1', '0;0;1;1')
+        + dot(104, 84, C.hunt, 6) + dot(116, 84, C.hunt, 6) + dot(104, 96, C.hunt, 6) + dot(116, 96, C.hunt, 6)
+        + phone(200, 22, 82, 136, txt(241, 70, '헌터 화면', C.gray, 10) + txt(241, 100, '2:00', '#fff', 26, `<animate attributeName="opacity" values="1;.4;1" dur="1s" repeatCount="indefinite"/>`) + txt(241, 122, '대기 중…', C.gray, 10)) },
+    { t: '누가 이기나', d: '러너는 <b>신호기 4곳을 순서대로</b> 다 켜면 승리.<br>헌터는 <b>러너를 전부 잡거나</b>, 제한 시간(25분)이 끝나면 승리.',
+      s: () => [0, 1, 2, 3].map(i => hex(30 + i * 30, 70, C.dim, i + 1, fillAt(5, .1 + i * .18, C.dim, C.run))).join('') + txt(75, 115, '러너 승리', C.run, 14, appear(5, .82)).replace('<text', '<text opacity="0"')
+        + `<line x1="150" y1="20" x2="150" y2="160" stroke="#2a2f3a" stroke-width="2"/>`
+        + [0, 1].map(i => `<g>${dot(200 + i * 40, 65, C.run, 10, fillAt(5, .25 + i * .3, C.run, C.gray))}${txt(200 + i * 40, 70, '⛓', '#fff', 11, appear(5, .26 + i * .3)).replace('<text', '<text opacity="0"')}</g>`).join('')
+        + txt(220, 115, '헌터 승리', C.hunt, 14, appear(5, .82)).replace('<text', '<text opacity="0"') + txt(220, 140, '⏱ 시간 끝나도', C.gray, 11) },
+    { t: '꼭 지켜요', d: '<b>건물 안</b>(로비·엘리베이터·주차장)은 금지. 차도는 <b>횡단보도</b>로만. 놀이터에 아이들이 있으면 피해요. 같은 팀끼리 💬 채팅은 자유!',
+      s: () => [['🏢', '건물 안 ✕', 55], ['🚸', '횡단보도', 150], ['💬', '팀 채팅', 245]].map(([e, l, x], i) => `<g opacity="0">${appear(3, .1 + i * .15)}${txt(x, 95, e, '#fff', 40)}${txt(x, 130, l, '#d6dbe4', 12)}</g>`).join('') },
+  ] },
+  runner: { name: '러너', slides: [
+    { t: '신호기를 순서대로 켜라', d: '지도에 <b>1~4번 초록 신호기</b>가 보여요. <b>1번부터 차례대로</b> 켜야 해요. 지금 켤 차례인 것만 반짝여요. 4개를 다 켜면 러너팀 승리!',
+      s: () => { const P = [[40, 140], [110, 55], [190, 125], [260, 50]]; return `<polyline points="${P.map(p => p.join(',')).join(' ')}" fill="none" stroke="#2a2f3a" stroke-width="3" stroke-dasharray="5 5"/>`
+        + P.map(([x, y], i) => hex(x, y, C.dim, i + 1, fillAt(7, [.04, .32, .58, .86][i], C.dim, C.run))).join('')
+        + mover(C.run, 7, 'M40 140 L110 55 L190 125 L260 50', '0;.05;.86;1', '0;0;1;1', 7) } },
+    { t: '원 안에서 30초', d: '차례인 신호기 주변에 <b>20m 점선 원</b>이 떠요. 원 안에서 <b>30초 버티면</b> 확보. 그동안 이동하면 안 되니까 가장 위험한 순간이에요.',
+      s: () => `<circle cx="170" cy="90" r="55" fill="${C.run}" fill-opacity=".1" stroke="${C.run}" stroke-width="2" stroke-dasharray="5 5"/>` + hex(170, 90, C.run, '1', '', 16)
+        + mover(C.run, 6, 'M40 90 L140 90', '0;.25;1', '0;1;1', 7)
+        + `<circle cx="170" cy="90" r="66" fill="none" stroke="${C.run}" stroke-width="5" stroke-linecap="round" stroke-dasharray="415" transform="rotate(-90 170 90)"><animate attributeName="stroke-dashoffset" dur="6s" repeatCount="indefinite" keyTimes="0;.28;.85;1" values="415;415;0;0"/></circle>`
+        + `<g opacity="0">${appear(6, .86)}<rect x="130" y="150" width="80" height="22" rx="11" fill="${C.run}"/>${txt(170, 165, '✓ 확보!', '#06231a', 12)}</g>` },
+    { t: '심장소리가 들리면 도망', d: '헌터가 <b>50m 안</b>에 오면 화면 테두리가 <b>붉게 뛰어요</b>. 30m, 15m로 가까워질수록 빨라져요. 🎧 이어폰을 켜면 소리도 나요.',
+      s: () => `<rect x="3" y="3" width="294" height="174" rx="16" fill="none" stroke="#ff1414" stroke-width="10" opacity="0"><animate attributeName="opacity" dur="5s" repeatCount="indefinite" keyTimes="0;.3;.5;.7;.75;.8;.85;.9;.95;1" values="0;0;.3;.1;.7;.2;.9;.3;1;0"/></rect>`
+        + [50, 32, 16].map((r, i) => `<circle cx="100" cy="90" r="${r * 1.4}" fill="none" stroke="#ff4d4d" stroke-opacity=".25" stroke-dasharray="3 4"/>` + txt(100, 90 - r * 1.4 - 3, `${[50, 30, 15][i]}m`, '#ff8a8a', 9)).join('')
+        + dot(100, 90, C.run, 8) + mover(C.hunt, 5, 'M290 90 L125 90', '0;.9;1', '0;1;1', 8)
+        + txt(240, 62, '💓', '#fff', 26, `<animateTransform attributeName="transform" type="scale" additive="sum" values="1;1.25;1" dur=".6s" repeatCount="indefinite"/>`).replace('<text ', '<text style="transform-origin:240px 53px;transform-box:view-box" ') },
+    { t: '90초마다 노출돼요', d: '헌터에게 <b>90초마다 내 정확한 위치</b>가 찍혀요. 화면 위 "노출까지" 타이머를 보고, 공개되기 직전에 방향을 틀어요.',
+      s: () => mover(C.run, 6, 'M40 130 L150 60 L260 120', '0;1', '0;1', 7)
+        + `<g opacity="0">${fade(6, '0;.3;.32;1', '0;0;1;.35')}<circle cx="117" cy="81" r="12" fill="none" stroke="${C.run}" stroke-width="3"/>${txt(117, 58, '📡 공개된 위치', C.run, 10)}</g>`
+        + `<rect x="190" y="20" width="96" height="24" rx="12" fill="#10131a" stroke="#2a2f3a"/>` + txt(238, 36, '노출까지 0:42', '#fff', 11) },
+    { t: '잡히면 내 코드를 보여줘', d: '헌터가 나를 <b>터치</b>하면 <b>👁 내 코드</b>를 눌러 보여줘요. 헌터가 그 4자리를 입력하면 잡혀요. 코드는 <b>누를 때마다 새로 바뀌고</b> 30초만 유효해요.',
+      s: () => dot(60, 95, C.run, 9, fillAt(5, .78, C.run, C.gray)) + mover(C.hunt, 5, 'M20 40 L50 85', '0;.25;1', '0;1;1', 9)
+        + phone(115, 30, 70, 120, txt(150, 60, '러너', C.run, 10) + `<g opacity="0">${appear(5, .35)}${txt(150, 100, '4821', '#fff', 20)}</g>`)
+        + phone(205, 30, 70, 120, txt(240, 60, '헌터', C.hunt, 10) + `<g opacity="0">${appear(5, .55)}<rect x="215" y="82" width="50" height="26" rx="6" fill="#1c212b"/>${txt(240, 100, '4821', '#fff', 14)}</g>` + `<g opacity="0">${appear(5, .78)}${txt(240, 132, '⛓ 잡음!', C.hunt, 12)}</g>`) },
+    { t: '동료를 구하러 가요', d: '잡힌 동료에게 가서 터치하면 동료가 <b>🔑 구출 코드</b>를 보여줘요. <b>🤝 구출</b>에 입력하면 부활! 둘 다 <b>30초 무적</b>. 1인 1회, 5분 넘으면 탈락이에요.',
+      s: () => `<circle cx="180" cy="90" r="11" stroke="#fff" stroke-width="2">${`<animate attributeName="fill" dur="6s" repeatCount="indefinite" keyTimes="0;.62;.64;1" values="${C.gray};${C.gray};${C.run};${C.run}"/>`}</circle>` + txt(180, 94, '⛓', '#fff', 11, fade(6, '0;.62;.64;1', '1;1;0;0'))
+        + mover(C.run, 6, 'M40 90 L158 90', '0;.4;1', '0;1;1', 9)
+        + `<g opacity="0">${appear(6, .42)}<rect x="152" y="40" width="56" height="24" rx="8" fill="#1c212b" stroke="${C.run}"/>${txt(180, 57, '🔑 7350', '#fff', 11)}</g>`
+        + `<g opacity="0">${appear(6, .66)}<circle cx="168" cy="90" r="32" fill="${C.blue}" fill-opacity=".12" stroke="${C.blue}" stroke-width="2"/>${txt(168, 145, '🛡 30초 무적', '#9cc3ff', 12)}</g>` },
+    { t: '📸 헌터를 도발해요', d: '사진을 찍어 <b>헌터 전원</b>에게 보낼 수 있어요 (1분에 1번). 단, 사진 배경으로 <b>위치가 들킬 수 있어요</b>. 하려면 제대로!',
+      s: () => phone(30, 30, 80, 120, `<rect x="40" y="50" width="60" height="60" rx="6" fill="#2b313c"/>${txt(70, 88, '😜', '#fff', 26)}${txt(70, 132, '잡아봐 ㅋ', '#fff', 10)}`)
+        + `<g>${move(3, 'M70 80 L230 80', '0;.6;1', '0;1;1')}<rect x="-14" y="-12" width="28" height="24" rx="4" fill="#fff" opacity=".9"/>${txt(0, 5, '📸', '#000', 12)}${fade(3, '0;.1;.6;.7;1', '0;1;1;0;0')}</g>`
+        + [[230, 50], [255, 85], [230, 120]].map(([x, y]) => dot(x, y, C.hunt, 9)).join('') + txt(240, 150, '헌터 화면에 뜸!', C.hunt, 11, appear(3, .6)).replace('<text', '<text opacity="0"') },
+  ] },
+  hunter: { name: '헌터', slides: [
+    { t: '러너를 전부 잡아라', d: '구역 안의 <b>러너를 모두 잡으면</b> 승리. 러너가 신호기를 다 켜기 전에 <b>제한 시간(25분)</b>이 끝나도 헌터 승리예요.',
+      s: () => [[90, 70], [200, 110]].map(([x, y], i) => `<g>${dot(x, y, C.run, 11, fillAt(5, .3 + i * .3, C.run, C.gray))}${txt(x, y + 4, '⛓', '#fff', 11, appear(5, .31 + i * .3)).replace('<text', '<text opacity="0"')}</g>`).join('')
+        + mover(C.hunt, 5, 'M30 30 L75 62', '0;.3;1', '0;1;1', 9) + mover(C.hunt, 5, 'M280 160 L215 120', '0;.6;1', '0;1;1', 9)
+        + txt(150, 165, '러너 전원 ⛓ = 승리', C.hunt, 13, appear(5, .7)).replace('<text', '<text opacity="0"') },
+    { t: '처음 2분은 기다려요', d: '게임이 시작되면 헌터 화면은 <b>2분간 꺼져요</b>. 러너가 흩어지는 시간이에요. 시작 지점에서 기다렸다가 추격 시작!',
+      s: () => phone(100, 15, 100, 150, txt(150, 60, '😑', '#fff', 26) + txt(150, 98, '1:59', '#fff', 28, `<animate attributeName="opacity" values="1;.35;1" dur="1s" repeatCount="indefinite"/>`) + txt(150, 125, '러너가 흩어지는 중…', C.gray, 9))
+        + mover(C.run, 3, 'M90 90 L20 40', '0;1', '0;1', 6) + mover(C.run, 3, 'M210 90 L285 140', '0;1', '0;1', 6) },
+    { t: '빨간 화살표를 따라가', d: '지도 위 내 위치 둘레의 <b>빨간 화살표</b>가 <b>가장 가까운 러너 방향</b>을 항상 가리켜요. 25m 안으로 들어오면 "눈으로 찾으세요"로 바뀌어요.',
+      s: () => `<circle cx="150" cy="90" r="40" fill="none" stroke="${C.hunt}" stroke-opacity=".35" stroke-width="2" stroke-dasharray="4 5"/>` + dot(150, 90, C.blue, 9)
+        + `<g><path d="M150 42 L160 58 L150 54 L140 58 Z" fill="${C.hunt}" stroke="#fff" stroke-width="1.5"/><animateTransform attributeName="transform" type="rotate" from="0 150 90" to="360 150 90" dur="8s" repeatCount="indefinite"/></g>`
+        + mover(C.run, 8, 'M150 18 A72 72 0 1 1 149.9 18', '0;1', '0;1', 7) },
+    { t: '90초마다 위치가 찍혀요', d: '러너의 실제 위치는 안 보여요. 대신 <b>90초마다 정확한 위치</b>가 지도에 찍혀요. 찍힌 점에서 어디로 갔을지 추리하세요.',
+      s: () => `<path d="M30 140 Q110 30 180 100 T280 40" fill="none" stroke="${C.run}" stroke-opacity=".15" stroke-width="2" stroke-dasharray="4 5"/>` + txt(150, 170, '실제 이동 경로는 안 보임', C.gray, 10)
+        + [[52, 112, .15], [150, 75, .45], [235, 72, .75]].map(([x, y, at]) => `<g opacity="0">${fade(6, `0;${at};${at + .02};1`, '0;0;1;.5')}<circle cx="${x}" cy="${y}" r="11" fill="none" stroke="${C.run}" stroke-width="3"/>${txt(x, y - 18, '📡', '#fff', 12)}</g>${ripple(x, y, C.run, 6, at * 6)}`).join('') },
+    { t: '신호기를 추리해 매복', d: '헌터 지도엔 <b>후보 신호기(?)</b>가 전부 보여요. 이 중 일부만 진짜고 순서도 몰라요. 🏁 진행도와 러너 동선을 보고 <b>다음 신호기를 예측해서 매복</b>!',
+      s: () => [[50, 50], [120, 35], [210, 45], [260, 110], [170, 130], [70, 130]].map(([x, y], i) => hex(x, y, C.acc, '?', i === 4 ? `<animate attributeName="fill" dur="5s" repeatCount="indefinite" keyTimes="0;.4;.42;1" values="${C.acc};${C.acc};#ff9f1c;#ff9f1c"/>` : '')).join('')
+        + mover(C.hunt, 5, 'M150 70 L158 118', '0;.45;.9;1', '0;0;1;1', 8)
+        + `<rect x="118" y="78" width="64" height="22" rx="11" fill="#10131a" stroke="#2a2f3a"/>` + txt(150, 93, '🏁 2/4', '#fff', 11) },
+    { t: '터치하고 코드 입력', d: '러너를 <b>직접 터치</b>하면 러너가 4자리 코드를 보여줘요. <b>🔒 잡기</b>에 입력하면 잡힘! <b>40m 안</b>에서만 통하고, <b>🛡 무적</b> 중인 러너는 못 잡아요.',
+      s: () => `<circle cx="80" cy="95" r="45" fill="${C.hunt}" fill-opacity=".07" stroke="${C.hunt}" stroke-opacity=".5" stroke-dasharray="4 4"/>` + txt(80, 155, '40m', '#ff8a8a', 10)
+        + dot(80, 95, C.run, 9, fillAt(5, .8, C.run, C.gray)) + mover(C.hunt, 5, 'M20 30 L70 85', '0;.3;1', '0;1;1', 9)
+        + phone(170, 25, 110, 130, txt(225, 52, '🔒 잡기', C.hunt, 12) + `<rect x="185" y="70" width="80" height="34" rx="8" fill="#1c212b"/>`
+          + ['4', '8', '2', '1'].map((d, i) => txt(203 + i * 15, 93, d, '#fff', 18, appear(5, .35 + i * .08)).replace('<text', '<text opacity="0"')).join('')
+          + `<g opacity="0">${appear(5, .8)}${txt(225, 132, '⛓ 잡았다!', C.hunt, 12)}</g>`) },
+    { t: '팀플레이가 핵심', d: '💬 <b>헌터 팀 채팅</b>으로 포위 작전을 짜요. "여기 막을게", "포위하자" 같은 빠른 메시지도 있어요. 잡힌 러너 근처에서 <b>구출하러 오는 러너를 매복</b>하는 것도 방법!',
+      s: () => dot(150, 95, C.run, 9) + [['M150 10 L150 70'], ['M290 95 L175 95'], ['M150 175 L150 120'], ['M10 95 L125 95']].map(([pth]) => mover(C.hunt, 4, pth, '0;.8;1', '0;1;1', 8)).join('')
+        + `<g opacity="0">${appear(4, .05)}<rect x="10" y="12" width="92" height="24" rx="12" fill="#1c212b"/>${txt(56, 28, '포위하자 💬', '#fff', 11)}</g>`
+        + `<g opacity="0">${appear(4, .25)}<rect x="196" y="140" width="94" height="24" rx="12" fill="#1c212b"/>${txt(243, 156, '여기 막을게', '#fff', 11)}</g>` },
+  ] },
+};
+let deck = null, slide = 0;
+function openDeck(k) { deck = k; slide = 0; show('#helpHome', false); show('#helpDeck', true); renderSlide(); }
+function helpHome() { deck = null; show('#helpDeck', false); show('#helpHome', true); $('#helpHead').textContent = '게임 방법'; }
+function renderSlide() {
+  const D = DECKS[deck], S = D.slides[slide];
+  $('#helpHead').textContent = D.name;
+  $('#tStage').innerHTML = svgWrap(S.s());
+  $('#tStep').textContent = `${D.name} · ${slide + 1} / ${D.slides.length}`;
+  [['#tStep', 'fadeUp'], ['#tTitle', 'fadeUp2'], ['#tDesc', 'fadeUp3']].forEach(([sel, c]) => { const el = $(sel); el.classList.remove(c); void el.offsetWidth; el.classList.add(c); });
+  $('#tTitle').textContent = S.t; $('#tDesc').innerHTML = S.d;
+  $('#tDots').innerHTML = D.slides.map((_, i) => `<i class="${i === slide ? 'on' : ''}"></i>`).join('');
+  $('#tPrev').textContent = slide === 0 ? '처음으로' : '이전';
+  $('#tNext').textContent = slide === D.slides.length - 1 ? '다른 역할 보기' : '다음';
+}
+function stepSlide(d) {
+  if (!deck) return;
+  const n = DECKS[deck].slides.length;
+  if (slide + d < 0 || slide + d >= n) return helpHome();
+  slide += d; renderSlide();
+}
+document.querySelectorAll('[data-deck]').forEach(b => b.onclick = () => openDeck(b.dataset.deck));
+$('#tPrev').onclick = () => stepSlide(-1);
+$('#tNext').onclick = () => stepSlide(1);
+$('#helpBack').onclick = () => deck ? helpHome() : show('#help', false);
+let swX = null;
+$('#helpDeck').addEventListener('touchstart', e => { swX = e.touches[0].clientX; }, { passive: true });
+$('#helpDeck').addEventListener('touchend', e => { if (swX == null) return; const dx = e.changedTouches[0].clientX - swX; swX = null; if (Math.abs(dx) > 50) stepSlide(dx < 0 ? 1 : -1); });
+document.querySelectorAll('.helpBtn').forEach(b => b.onclick = () => {
+  show('#help', true);
+  const r = (me() || {}).role;
+  if (room && room.status === 'playing' && r) openDeck(r); else helpHome();
+});
 $('#helpClose').onclick = () => show('#help', false);
 // 처음 열 때 내 위치로 지도 이동
 ensureGeo().catch(() => {});
